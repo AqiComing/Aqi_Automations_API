@@ -16,6 +16,6 @@ urlpatterns=[
     url(r'global/host_total', global_host.HostTotal.as_view()),
     url(r'global/del_host', global_host.DelHost.as_view()),
     url(r'global/update_host', global_host.UpdateHost.as_view()),
-    url(r'global/disable_host', global_host.UpdateHost.as_view()),
-    url(r'global/update_host', global_host.UpdateHost.as_view()),
+    url(r'global/disable_host', global_host.EnableHost.as_view()),
+    url(r'global/enable_host', global_host.EnableHost.as_view()),
 ]

@@ -190,7 +190,7 @@ class EnableHost(APIView):
         :return:
         """
         data=JSONParser().parse(request)
-        project=get_availability_project(data)
+        project=get_availability_project(data,request.user)
         result=parameter_id_check(data) if isinstance(project,Project) else project
         if result:
             return result
@@ -200,7 +200,8 @@ class EnableHost(APIView):
             return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST,msg='未找到指定host')
         host.status=not host.status
         host.save()
-        record_dynamic(project=data['project_id'], _type='启用/禁用', operation_object='域名', user=request.user.pk,
+        _type = '启用' if host.status else '禁用'
+        record_dynamic(project=data['project_id'], _type=_type, operation_object='域名', user=request.user.pk,
                        data=host.name)
         return JsonResponse(code=code.CODE_SUCCESS)
 
