@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from api_test.views import user, project, dynamic, global_host
+from api_test.views import user, project, dynamic, global_host, member
 
 urlpatterns=[
     url(r'user/login',user.ObtainAuthToken.as_view()),
@@ -18,4 +18,7 @@ urlpatterns=[
     url(r'global/update_host', global_host.UpdateHost.as_view()),
     url(r'global/disable_host', global_host.EnableHost.as_view()),
     url(r'global/enable_host', global_host.EnableHost.as_view()),
+    url(r'member/project_member', member.ProjectMemberList.as_view()),
+    url(r'member/email_config', member.EmailConfig.as_view()),
+    url(r'member/get_email', member.GetEmail.as_view()),
 ]

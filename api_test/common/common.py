@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from rest_framework.parsers import JSONParser
 
 from api_test.common import code
@@ -43,3 +44,38 @@ def get_availability_project(data,user):
     except ObjectDoesNotExist:
         return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST, msg='项目不存在')
     return project
+
+
+def objects_paginator(request,model,_order_by=None):
+    """
+    获取项目动态
+    :param request:
+    :return:
+    """
+    try:
+        page_size = int(request.GET.get("page_size", 20))
+        page = int(request.GET.get("page", 1))
+    except(TypeError, ValueError):
+        return JsonResponse(code=code.CODE_KEY_ERROR, msg="page and page size must be integer")
+    project_id = request.GET.get('project_id')
+    if not project_id.isdecimal():
+        return JsonResponse(code=code.CODE_PARAMETER_ERROR)
+    try:
+        project = Project.objects.get(id=project_id)
+    except ObjectDoesNotExist:
+        return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST, msg="项目不存在或已删除！")
+    if not project.status:
+        return JsonResponse(code=code.CODE_PROJECT_DISABLE)
+    if _order_by:
+        objects = model.objects.filter(project=project_id).order_by(_order_by)
+    else:
+        objects = model.objects.filter(project=project_id)
+    paginator = Paginator(objects, page_size)
+    total = paginator.num_pages
+    try:
+        obm = paginator.page(page)
+    except PageNotAnInteger:
+        obm = paginator.page(1)
+    except EmptyPage:
+        obm = paginator.page(paginator.num_pages)
+    return {"obm":obm,"page":page,"total":total}

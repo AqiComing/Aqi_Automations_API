@@ -36,13 +36,13 @@
 		</el-dialog>
         <el-col :span="24">
             <el-table :data="memberData" highlight-current-row v-loading="listLoading" style="width: 100%;">
-                <el-table-column prop="username" label="姓名" min-width="30%" sortable>
+                <el-table-column prop="user_name" label="姓名" min-width="30%" sortable>
                 </el-table-column>
-                <el-table-column prop="permissionType" label="权限" min-width="30%" sortable>
+                <el-table-column prop="permission_type" label="权限" min-width="30%" sortable>
                 </el-table-column>
-                <el-table-column prop="userPhone" label="手机号" min-width="20%" sortable>
+                <el-table-column prop="user_phone" label="手机号" min-width="20%" sortable>
                 </el-table-column>
-                <el-table-column prop="userEmail" label="邮箱地址" min-width="20%" sortable>
+                <el-table-column prop="user_email" label="邮箱地址" min-width="20%" sortable>
                 </el-table-column>
             </el-table>
             <!--工具条-->
@@ -134,7 +134,7 @@
                     if (code === '999999') {
                         console.log(data);
                         if (data) {
-                            self.reportFrom = data.reportFrom;
+                            self.reportFrom = data.sender_mailbox;
                             self.editForm = data
                         } else {
                             self.reportFrom = "";
@@ -185,10 +185,10 @@
                             //NProgress.start();
                             let params = {
                                 project_id: Number(this.$route.params.project_id),
-                                reportFrom: this.editForm.reportFrom,
-                                mailUser: this.editForm.mailUser,
-                                mailPass: this.editForm.mailPass,
-                                mailSmtp: this.editForm.mailSmtp,
+                                sender_mailbox: this.editForm.reportFrom,
+                                user_name: this.editForm.mailUser,
+                                mail_token: this.editForm.mailPass,
+                                mail_smtp: this.editForm.mailSmtp,
                             };
                             let headers = {
                                 "Content-Type": "application/json",

@@ -99,3 +99,44 @@ class GlobalHost(models.Model):
     class Meta:
         verbose_name = 'HOST'
         verbose_name_plural = 'Host管理'
+
+
+class ReportSenderConfig(models.Model):
+    id=models.AutoField(primary_key=True)
+    project=models.ForeignKey(Project,on_delete=models.CASCADE,verbose_name='项目')
+    sender_mailbox=models.EmailField(max_length=1024,blank=True,null=True,verbose_name='发件人邮箱')
+    user_name=models.CharField(max_length=50,blank=True,null=True,verbose_name='用户名')
+    mail_token=models.CharField(max_length=1024,blank=True,null=True,verbose_name='邮箱口令')
+    mail_smtp=models.CharField(max_length=1024,blank=True,null=True,verbose_name='邮箱服务器')
+
+    def __unicode__(self):
+        return self.sender_mailbox
+
+    class Meta:
+        verbose_name='邮件发送配置'
+        verbose_name_plural='邮件发送配置'
+
+
+class ProjectMember(models.Model):
+    """"
+    项目成员
+    """
+    CHOICES={
+        ('超级管理员','超级管理员'),
+        ('开发人员', '开发人员'),
+        ('测试人员', '测试人员'),
+    }
+    id=models.AutoField(primary_key=True)
+    permission_type=models.CharField(max_length=50,verbose_name='权限角色',choices=CHOICES)
+    project=models.ForeignKey(Project,on_delete=models.CASCADE,related_name='member_project',verbose_name='所属项目')
+    user=models.ForeignKey(User,related_name='member_user',on_delete=models.CASCADE,verbose_name='用户')
+
+    def __unicode__(self):
+        return self.permission_type
+
+    def __str__(self):
+        return self.permission_type
+
+    class Meta:
+        verbose_name='项目成员'
+        verbose_name_plural='项目成员'
