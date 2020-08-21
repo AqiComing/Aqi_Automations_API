@@ -140,3 +140,22 @@ class ProjectMember(models.Model):
     class Meta:
         verbose_name='项目成员'
         verbose_name_plural='项目成员'
+
+
+class APIGroup(models.Model):
+    """
+    接口一级分组
+    """
+    id=models.AutoField(primary_key=True)
+    project=models.ForeignKey(Project,on_delete=models.CASCADE,verbose_name='项目')
+    name=models.CharField(max_length=50,verbose_name='接口一级分组')
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name='接口一级分组'
+        verbose_name_plural='接口一级分组'

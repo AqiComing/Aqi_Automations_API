@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-from api_test.models import Project, ProjectDynamic, GlobalHost, ReportSenderConfig, ProjectMember
+from api_test.models import Project, ProjectDynamic, GlobalHost, ReportSenderConfig, ProjectMember, APIGroup
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -121,3 +121,12 @@ class ProjectMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model=ProjectMember
         fields=('id','permission_type','user_name','user_phone','user_email')
+
+
+class APIGroupSerializer(serializers.ModelSerializer):
+    """
+    接口分组序列化
+    """
+    class Meta:
+        model=APIGroup
+        fields=('id','project_id','name')

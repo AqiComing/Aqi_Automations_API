@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from api_test.views import user, project, dynamic, global_host, member
+from api_test.views import user, project, dynamic, global_host, member, api_group
 
 urlpatterns=[
     url(r'user/login',user.ObtainAuthToken.as_view()),
@@ -21,4 +21,6 @@ urlpatterns=[
     url(r'member/project_member', member.ProjectMemberList.as_view()),
     url(r'member/email_config', member.EmailConfig.as_view()),
     url(r'member/get_email', member.GetEmail.as_view()),
+    url(r'api/group', api_group.APIGroupView.as_view()),
+    url(r'api/add_group', api_group.APIGroupAdd.as_view()),
 ]

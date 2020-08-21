@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from api_test.common import code
 from api_test.common.api_response import JsonResponse
 from api_test.common.code import CODE_SUCCESS
-from api_test.common.common import record_dynamic, get_availability_project
+from api_test.common.common import record_dynamic, get_availability_project, check_project_status
 from api_test.models import Project
 from api_test.serializer import ProjectSerializer, ProjectDeserializer
 
@@ -209,15 +209,8 @@ class ProjectInfo(APIView):
         :param request:
         :return:
         """
-        project_id=request.GET.get('project_id')
-        if not project_id and not project_id.isdecimal():
-            return JsonResponse(code=code.CODE_PARAMETER_ERROR)
-        try:
-            project_info=Project.objects.get(id=project_id)
-        except ObjectDoesNotExist:
-            return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST,msg='项目不存在')
-        serializer=ProjectSerializer(project_info)
-        if serializer.data['status']:
-            return JsonResponse(data=serializer.data,code=code.CODE_SUCCESS)
-        else:
-            return JsonResponse(code=code.CODE_PROJECT_DISABLE)
+        project=check_project_status(request)
+        if not isinstance(project,Project):
+            return project
+        serializer=ProjectSerializer(project)
+        return JsonResponse(data=serializer.data,code=code.CODE_SUCCESS)
