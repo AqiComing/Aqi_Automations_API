@@ -6,6 +6,30 @@ from rest_framework.authtoken.models import Token
 from django.db import models
 
 PROJECT_TYPE = (('Web', 'Web'), ('App', 'App'))
+HTTP_CHOICE=(
+    ('HTTP','HTTP'),
+    ('HTTPS','HTTPS')
+)
+REQUEST_TYPE_CHOICE=(
+    ('POST','POST'),
+    ('GET','GET'),
+    ('PUT','PUT'),
+    ('DELETE','DELETE')
+)
+REQUEST_PARAMETER_TYPE_CHOICE=(
+    ('form-data','表单(form-data)'),
+    ('raw','源数据（raw）'),
+    ('Restful','Restful')
+)
+HTTP_CODE_CHOICE=(
+    ('200','200'),
+    ('302','302'),
+    ('400','400'),
+    ('404','404'),
+    ('500','500'),
+    ('502','502'),
+)
+PARAMETER_TYPE_CHOICE=(('Int','Int'),('String','String'))
 
 """
 @receiver(post_save,sender=**)
@@ -159,3 +183,102 @@ class APIGroup(models.Model):
     class Meta:
         verbose_name='接口一级分组'
         verbose_name_plural='接口一级分组'
+
+
+class APIInfo(models.Model):
+    """
+    接口信息
+    """
+    id = models.AutoField(primary_key=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='api_project', verbose_name='所属项目')
+    api_group = models.ForeignKey(APIGroup, blank=True, null=True, related_name='api_group', on_delete=models.SET_NULL,
+                                  verbose_name='所属分组')
+    name=models.CharField(max_length=50,verbose_name="接口名称")
+    http_type=models.CharField(max_length=50,default='HTTP',verbose_name='http/https',choices=HTTP_CHOICE)
+    request_type=models.CharField(max_length=50,verbose_name='请求方式',choices=REQUEST_TYPE_CHOICE)
+    api_address=models.CharField(max_length=1024,verbose_name='接口地址')
+    request_parameter_type=models.CharField(max_length=50,verbose_name='请求参数格式',choices=REQUEST_PARAMETER_TYPE_CHOICE)
+    status=models.BooleanField(default=True,verbose_name='状态')
+    mock_status=models.BooleanField(default=False,verbose_name='mock状态')
+    mock_code=models.CharField(max_length=50,blank=True,null=True,verbose_name='Http状态',choices=HTTP_CODE_CHOICE)
+    data=models.TextField(blank=True,null=True,verbose_name='Mock内容')
+    last_update_time=models.DateTimeField(auto_now=True,verbose_name='最近更新')
+    update_user=models.ForeignKey(User,on_delete=models.SET_NULL,null=True,max_length=50,verbose_name='更新人',related_name='api_update_user')
+    description=models.CharField(max_length=1024,blank=True,null=True,verbose_name='描述')
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '接口'
+        verbose_name_plural = '接口管理'
+
+
+class APIHead(models.Model):
+    id=models.AutoField(primary_key=True)
+    api=models.ForeignKey(APIInfo,on_delete=models.CASCADE,verbose_name='所属接口',related_name='headers')
+    name=models.CharField(max_length=1024,verbose_name='消息头')
+    value=models.CharField(max_length=1024,blank=True,null=True,verbose_name='请求值')
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '请求头'
+        verbose_name_plural = '请求头管理'
+
+
+class APIParameter(models.Model):
+    id=models.AutoField(primary_key=True)
+    api=models.ForeignKey(APIInfo,on_delete=models.CASCADE,verbose_name='所属接口',related_name='request_parameters')
+    name=models.CharField(max_length=1024,verbose_name='参数名')
+    _type=models.CharField(default='String',max_length=1024,verbose_name='参数类型',choices=PARAMETER_TYPE_CHOICE)
+    value=models.CharField(max_length=1024,blank=True,null=True,verbose_name='参数值')
+    required=models.BooleanField(default=True,verbose_name='是否必填')
+    restrict=models.CharField(max_length=1024,blank=True,null=True,verbose_name='输入限制')
+    description=models.CharField(max_length=1024,blank=True,null=True,verbose_name='描述')
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '请求参数'
+        verbose_name_plural = '请求参数管理'
+
+
+class APIParameterRaw(models.Model):
+    id=models.AutoField(primary_key=True)
+    api=models.OneToOneField(APIInfo,on_delete=models.CASCADE,verbose_name='所属接口',related_name='request_parameter_raw')
+    data=models.TextField(blank=True,null=True,verbose_name='内容')
+
+    class Meta:
+        verbose_name='请求参数Raw'
+
+
+class APIResponse(models.Model):
+    id=models.AutoField(primary_key=True)
+    api=models.ForeignKey(APIInfo,on_delete=models.CASCADE,verbose_name='所属接口',related_name='response')
+    name=models.CharField(max_length=1024,verbose_name='参数名')
+    _type=models.CharField(default='String',max_length=1024,verbose_name='参数类型',choices=PARAMETER_TYPE_CHOICE)
+    value=models.CharField(max_length=1024,blank=True,null=True,verbose_name='参数值')
+    required=models.BooleanField(default=True,verbose_name='是否必含')
+    description=models.CharField(max_length=1024,blank=True,null=True,verbose_name='描述')
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '返回参数'
+        verbose_name_plural = '返回参数管理'

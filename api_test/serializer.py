@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-from api_test.models import Project, ProjectDynamic, GlobalHost, ReportSenderConfig, ProjectMember, APIGroup
+from api_test.models import Project, ProjectDynamic, GlobalHost, ReportSenderConfig, ProjectMember, APIGroup, APIHead, \
+    APIParameter, APIParameterRaw, APIResponse, APIInfo
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -130,3 +131,64 @@ class APIGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model=APIGroup
         fields=('id','project_id','name')
+
+
+class APIHeadSerializer(serializers.ModelSerializer):
+    """
+    接口请求头序列化
+    """
+    class Meta:
+        model=APIHead
+        fields=('id','api','name','value')
+
+
+class APIParameterSerializer(serializers.ModelSerializer):
+    """
+    接口请求头序列化
+    """
+    class Meta:
+        model=APIParameter
+        fields=('id','api','name','value','_type','required','restrict','description')
+
+
+class APIParameterRawSerializer(serializers.ModelSerializer):
+    """
+    接口请求参数源数据序列化
+    """
+    class Meta:
+        model=APIParameterRaw
+        fields=('id','api','data')
+
+
+class APIResponseSerializer(serializers.ModelSerializer):
+    """
+    接口返回参数序列化
+    """
+    class Meta:
+        model=APIResponse
+        fields=('id','api','name','value','_type','required','description')
+
+
+class APIInfoSerializer(serializers.ModelSerializer):
+    """
+    接口详细信息序列化
+    """
+    last_update_time=serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    headers=APIHeadSerializer(many=True,read_only=True)
+    request_parameter=APIHeadSerializer(many=True,read_only=True)
+    response=APIResponseSerializer(many=True,read_only=True)
+    request_parameter_raw=APIParameterRawSerializer(many=False,read_only=True)
+    update_user=serializers.CharField(source='user_update.first_name')
+
+    class Meta:
+        model=APIInfo
+        fields=('id','api_group','name','http_type','request_type','api_address','headers',
+                'request_parameter_type','request_parameter','request_parameter_raw','status',
+                'response','mock_code','data','last_update_time','update_user','description')
+
+
+class APIInfoDeserializer(serializers.ModelSerializer):
+    class Meta:
+        model=APIInfo
+        fields=('id','project_id','name','http_type','request_type','api_address',
+                'request_parameter_type','status','mock_code','data','last_update_time','update_user','description')
