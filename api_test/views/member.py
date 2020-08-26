@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from api_test.common import code
 from api_test.common.api_response import JsonResponse
 from api_test.common.common import get_availability_project, record_dynamic, objects_paginator
+from api_test.common.parameter_check import project_status_check
 from api_test.models import Project, ReportSenderConfig, ProjectMember
 from api_test.serializer import ReportSenderConfigDeserializer, ReportSenderConfigSerializer, ProjectMemberSerializer
 
@@ -35,9 +36,11 @@ class ProjectMemberList(APIView):
         :param request:
         :return:
         """
-        result=objects_paginator(request,model=ProjectMember,_order_by='id')
-        if isinstance(result,JsonResponse):
+        result=project_status_check(request)
+        if result:
             return result
+        objects = ProjectMember.objects.filter(project=request.GET.get('project_id')).order_by('id')
+        result=objects_paginator(request,objects)
         serialize=ProjectMemberSerializer(result['obm'],many=True)
         return JsonResponse(data={"data":serialize.data,
                                   "page":result['page'],

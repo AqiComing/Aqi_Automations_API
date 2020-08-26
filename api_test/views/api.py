@@ -6,10 +6,11 @@ from rest_framework.views import APIView
 
 from api_test.common import code
 from api_test.common.api_response import JsonResponse
-from api_test.common.common import get_availability_project, record_dynamic
-from api_test.models import Project, APIInfo, APIGroup, APIParameterRaw
-from api_test.serializer import APIInfoSerializer, APIParameterSerializer, APIParameterRawSerializer, \
-    APIResponseSerializer, APIInfoDeserializer, APIHeadSerializer
+from api_test.common.common import get_availability_project, record_dynamic, objects_paginator
+from api_test.common.parameter_check import project_status_check
+from api_test.models import Project, APIInfo, APIGroup
+from api_test.serializer import APIParameterSerializer, APIParameterRawSerializer, \
+    APIResponseSerializer, APIInfoDeserializer, APIHeadSerializer, APIInfoListSerializer
 
 
 def all_parameter_check(data):
@@ -33,6 +34,36 @@ def all_parameter_check(data):
         return JsonResponse(code=code.CODE_KEY_ERROR)
 
 
+class APIList(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = ()
+
+    def get(self,request):
+        result = project_status_check(request)
+        if result:
+            return result
+        project_id,api_group_id,name=request.GET.get('project_id'),request.GET.get('api_group_id'),request.GET.get('name')
+        if api_group_id:
+            if not api_group_id.isdecimal():
+                return JsonResponse(code=code.CODE_PARAMETER_ERROR)
+            if name:
+                objects=APIInfo.objects.filter(project=project_id,name__contains=name,api_group=api_group_id).order_by('id')
+            else:
+                objects = APIInfo.objects.filter(project=project_id, api_group=api_group_id).order_by('id')
+        else:
+            if name:
+                objects=APIInfo.objects.filter(project=project_id,name__contains=name).order_by('id')
+            else:
+                objects = APIInfo.objects.filter(project=project_id).order_by('id')
+
+        result = objects_paginator(request, objects)
+        serialize = APIInfoListSerializer(result['obm'], many=True)
+        return JsonResponse(data={"data": serialize.data,
+                                  "page": result['page'],
+                                  "total": result['total']
+                                  }, code=code.CODE_SUCCESS)
+
+
 class AddAPI(APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = ()
@@ -43,7 +74,6 @@ class AddAPI(APIView):
         :param request:
         :return:
         """
-
         data=JSONParser().parse(request)
         data['update_user'] = request.user.pk
         project=get_availability_project(data,request.user)

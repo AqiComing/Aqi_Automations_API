@@ -143,7 +143,7 @@
                 let self = this;
                 let param = { project_id: this.$route.params.project_id, page: self.page};
                 if (this.$route.params.firstGroup) {
-                    param['apiGroupLevelFirst_id'] = this.$route.params.firstGroup;
+                    param['api_group_id'] = this.$route.params.firstGroup;
                 }
 
                 $.ajax({

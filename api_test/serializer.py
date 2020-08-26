@@ -178,7 +178,7 @@ class APIInfoSerializer(serializers.ModelSerializer):
     request_parameter=APIHeadSerializer(many=True,read_only=True)
     response=APIResponseSerializer(many=True,read_only=True)
     request_parameter_raw=APIParameterRawSerializer(many=False,read_only=True)
-    update_user=serializers.CharField(source='user_update.first_name')
+    update_user=serializers.CharField(source='update_user.first_name')
 
     class Meta:
         model=APIInfo
@@ -192,3 +192,15 @@ class APIInfoDeserializer(serializers.ModelSerializer):
         model=APIInfo
         fields=('id','project_id','name','http_type','request_type','api_address',
                 'request_parameter_type','status','mock_code','data','last_update_time','update_user','description')
+
+
+class APIInfoListSerializer(serializers.ModelSerializer):
+    """
+    接口列表序列化
+    """
+    last_update_time=serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    update_user=serializers.CharField(source='update_user.first_name')
+
+    class Meta:
+        model=APIInfo
+        fields=('id','name','request_type','api_address','mock_status','last_update_time','update_user')

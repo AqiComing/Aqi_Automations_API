@@ -1,5 +1,4 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import transaction
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.parsers import JSONParser
@@ -7,8 +6,7 @@ from rest_framework.views import APIView
 
 from api_test.common import code
 from api_test.common.api_response import JsonResponse
-from api_test.common.code import CODE_SUCCESS
-from api_test.common.common import record_dynamic, get_availability_project, check_project_status
+from api_test.common.common import record_dynamic, get_availability_project, check_project_status, objects_paginator
 from api_test.models import Project
 from api_test.serializer import ProjectSerializer, ProjectDeserializer
 
@@ -42,6 +40,7 @@ def project_id_check(data):
 
 class ProjectList(APIView):
     authentication_classes = [TokenAuthentication,]
+    permission_classes = ()
 
     def get(self,request):
         """
@@ -49,29 +48,17 @@ class ProjectList(APIView):
         :param request:
         :return:
         """
-        try:
-            page_size = int(request.GET.get("page_size", 20))
-            page = int(not request.GET.get("page", 1))
-        except(TypeError, ValueError):
-            return JsonResponse(code='999985', msg="page and page_size must be integer")
-
         name = request.GET.get('name')
         if name:
-            obi = Project.objects.filter(name__contains=name)
+            objects = Project.objects.filter(name__contains=name)
         else:
-            obi = Project.objects.all().order_by('id')
-        paginator = Paginator(obi, page_size)
-        total = paginator.num_pages
-        try:
-            obm = paginator.page(page)
-        except PageNotAnInteger:
-            obm = paginator.page(1)
-        except EmptyPage:
-            obm = paginator.page(paginator.num_pages)
-        serializer = ProjectSerializer(obm, many=True)
-        return JsonResponse(code=CODE_SUCCESS, data={"data": serializer.data,
-                                                 "page": page,
-                                                 "total": total})
+            objects = Project.objects.all().order_by('id')
+        result = objects_paginator(request, objects)
+        serializer = ProjectSerializer(result['obm'],many=True)
+        return JsonResponse(data={"data": serializer.data,
+                                  "page": result['page'],
+                                  "total": result['total']
+                                  }, code=code.CODE_SUCCESS)
 
 
 class AddProject(APIView):

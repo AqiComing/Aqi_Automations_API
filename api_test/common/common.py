@@ -64,9 +64,9 @@ def check_project_status(request):
     return project
 
 
-def objects_paginator(request,model,_order_by=None):
+def objects_paginator(request,objects):
     """
-    获取项目动态
+    将objects填充道页面中，进行分页
     :param request:
     :return:
     """
@@ -75,19 +75,7 @@ def objects_paginator(request,model,_order_by=None):
         page = int(request.GET.get("page", 1))
     except(TypeError, ValueError):
         return JsonResponse(code=code.CODE_KEY_ERROR, msg="page and page size must be integer")
-    project_id = request.GET.get('project_id')
-    if not project_id.isdecimal():
-        return JsonResponse(code=code.CODE_PARAMETER_ERROR)
-    try:
-        project = Project.objects.get(id=project_id)
-    except ObjectDoesNotExist:
-        return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST, msg="项目不存在或已删除！")
-    if not project.status:
-        return JsonResponse(code=code.CODE_PROJECT_DISABLE)
-    if _order_by:
-        objects = model.objects.filter(project=project_id).order_by(_order_by)
-    else:
-        objects = model.objects.filter(project=project_id)
+
     paginator = Paginator(objects, page_size)
     total = paginator.num_pages
     try:
@@ -96,7 +84,7 @@ def objects_paginator(request,model,_order_by=None):
         obm = paginator.page(1)
     except EmptyPage:
         obm = paginator.page(paginator.num_pages)
-    return {"obm":obm,"page":page,"total":total}
+    return{"obm":obm,"page":page,"total":total}
 
 
 

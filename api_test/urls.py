@@ -26,4 +26,6 @@ urlpatterns=[
     url(r'api/del_group', api_group.DelAPIGroup.as_view()),
     url(r'api/update_name_group', api_group.UpdateAPIGroup.as_view()),
     url(r'api/add_api', api.AddAPI.as_view()),
+    url(r'api/api_list', api.APIList.as_view()),
+
 ]
