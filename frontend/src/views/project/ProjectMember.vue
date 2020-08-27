@@ -5,28 +5,28 @@
         <div style="margin-bottom: 20px;font-size: 20px">
             <div>
                 <div style="display: inline">测试报告发送账号： </div>
-                <div v-if="!reportFrom" style="display: inline">未添加账号</div>
-                <div v-if="reportFrom" style="display: inline">{{reportFrom}}</div>
+                <div v-if="!sender_mailbox" style="display: inline">未添加账号</div>
+                <div v-if="sender_mailbox" style="display: inline">{{sender_mailbox}}</div>
 
                 &nbsp;&nbsp;
                 <i class="el-icon-edit" style="cursor:pointer;display: inline" @click="editFormVisible=true"></i>
                                 &nbsp;&nbsp;
-                <i v-if="reportFrom" class="el-icon-delete" style="cursor:pointer;display: inline" @click="DelEmail()"></i>
+                <i v-if="sender_mailbox" class="el-icon-delete" style="cursor:pointer;display: inline" @click="DelEmail()"></i>
             </div>
         </div>
         <el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false" style="width: 60%; left: 20%">
 		    <el-form :model="editForm" label-width="100px"  :rules="editFormRules" ref="editForm">
-                <el-form-item label="发送人邮箱:" prop="reportFrom">
-                    <el-input v-model.trim="editForm.reportFrom" auto-complete="off"></el-input>
+                <el-form-item label="发送人邮箱:" prop="sender_mailbox">
+                    <el-input v-model.trim="editForm.sender_mailbox" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="用户名:" prop="mailUser">
-                    <el-input v-model.trim="editForm.mailUser" auto-complete="off"></el-input>
+                <el-form-item label="用户名:" prop="user_name">
+                    <el-input v-model.trim="editForm.user_name" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="口令:" prop="mailPass">
-                    <el-input v-model.trim="editForm.mailPass" auto-complete="off"></el-input>
+                <el-form-item label="口令:" prop="mail_token">
+                    <el-input v-model.trim="editForm.mail_token" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="邮箱服务器:" prop="mailSmtp">
-                    <el-input v-model.trim="editForm.mailSmtp" auto-complete="off"></el-input>
+                <el-form-item label="邮箱服务器:" prop="mail_smtp">
+                    <el-input v-model.trim="editForm.mail_smtp" auto-complete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -61,23 +61,23 @@
                 total: 0,
                 page: 1,
                 listLoading: false,
-                reportFrom: "",
+                sender_mailbox: "",
                 editFormVisible: false,//编辑界面是否显示
                 editLoading: false,
                 editFormRules: {
-                    reportFrom: [
+                    sender_mailbox: [
                         { required: true, message: '请输入发送人', trigger: 'blur' },
                         { min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur' }
                     ],
-                    mailUser: [
+                    user_name: [
                         { required: true, message: '请输入用户名', trigger: 'blur' },
                         { min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur' }
                     ],
-                    mailPass: [
+                    mail_token: [
                         { required: true, message: '请输入口令', trigger: 'blur' },
                         { min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur' }
                     ],
-                    mailSmtp: [
+                    mail_smtp: [
                         { required: false, message: '请输入邮件服务器', trigger: 'blur' },
                         { min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur' }
                     ]
@@ -134,10 +134,10 @@
                     if (code === '999999') {
                         console.log(data);
                         if (data) {
-                            self.reportFrom = data.sender_mailbox;
+                            self.sender_mailbox = data.sender_mailbox;
                             self.editForm = data
                         } else {
-                            self.reportFrom = "";
+                            self.sender_mailbox = "";
                             self.editForm = {}
                         }
                     }
@@ -185,10 +185,10 @@
                             //NProgress.start();
                             let params = {
                                 project_id: Number(this.$route.params.project_id),
-                                sender_mailbox: this.editForm.reportFrom,
-                                user_name: this.editForm.mailUser,
-                                mail_token: this.editForm.mailPass,
-                                mail_smtp: this.editForm.mailSmtp,
+                                sender_mailbox: this.editForm.sender_mailbox,
+                                user_name: this.editForm.user_name,
+                                mail_token: this.editForm.mail_token,
+                                mail_smtp: this.editForm.mail_smtp,
                             };
                             let headers = {
                                 "Content-Type": "application/json",

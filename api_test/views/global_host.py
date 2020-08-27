@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from api_test.common import code
 from api_test.common.api_response import JsonResponse
 from api_test.common.common import record_dynamic, get_availability_project
-from api_test.common.parameter_check import parameter_id_check
+from api_test.common.parameter_check import parameter_ids_check
 from api_test.models import Project, GlobalHost
 from api_test.serializer import HostSerializer
 
@@ -115,16 +115,6 @@ class DelHost(APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = ()
 
-    def parameter_check(self,data):
-        try:
-            if not isinstance(data['ids'], list) or not isinstance(data['project_id'], int):
-                return JsonResponse(code=code.CODE_PARAMETER_ERROR)
-            for i in data['ids']:
-                if not isinstance(i,int):
-                    return JsonResponse(code=code.CODE_PARAMETER_ERROR)
-        except KeyError:
-            return JsonResponse(code=code.CODE_KEY_ERROR)
-
     def post(self, request):
         """
         删除域名
@@ -133,7 +123,7 @@ class DelHost(APIView):
         """
         data=JSONParser().parse(request)
         project=get_availability_project(data,request.user)
-        result=parameter_id_check(data) if isinstance(project,Project) else project
+        result=parameter_ids_check(data) if isinstance(project,Project) else project
         if result:
             return result
         try:

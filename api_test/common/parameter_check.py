@@ -5,7 +5,7 @@ from api_test.common.api_response import JsonResponse
 from api_test.models import Project
 
 
-def parameter_id_check(data):
+def parameter_ids_check(data):
     """
     检查传入项目id或者id列表参数可用性
     :param data:

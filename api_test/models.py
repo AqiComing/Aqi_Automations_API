@@ -22,6 +22,7 @@ REQUEST_PARAMETER_TYPE_CHOICE=(
     ('Restful','Restful')
 )
 HTTP_CODE_CHOICE=(
+    ('0','0'),
     ('200','200'),
     ('302','302'),
     ('400','400'),

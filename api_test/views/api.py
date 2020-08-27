@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from rest_framework.authentication import TokenAuthentication
@@ -10,7 +11,7 @@ from api_test.common.common import get_availability_project, record_dynamic, obj
 from api_test.common.parameter_check import project_status_check
 from api_test.models import Project, APIInfo, APIGroup
 from api_test.serializer import APIParameterSerializer, APIParameterRawSerializer, \
-    APIResponseSerializer, APIInfoDeserializer, APIHeadSerializer, APIInfoListSerializer
+    APIResponseSerializer, APIInfoDeserializer, APIHeadSerializer, APIInfoListSerializer, APIInfoSerializer
 
 
 def all_parameter_check(data):
@@ -62,6 +63,30 @@ class APIList(APIView):
                                   "page": result['page'],
                                   "total": result['total']
                                   }, code=code.CODE_SUCCESS)
+
+
+class APIInfoView(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = ()
+
+    def get(self,request):
+        """
+        获取接口详情
+        :param request:
+        :return:
+        """
+        api_id=request.GET.get('api_id')
+        if not api_id or not api_id.isdecimal():
+            return JsonResponse(code=code.CODE_PARAMETER_ERROR)
+        result=project_status_check(request)
+        if result:
+            return result
+        try:
+            api_info=APIInfo.objects.get(id=api_id,project=request.GET.get('project_id'))
+            serializer=APIInfoSerializer(api_info)
+            return JsonResponse(data=serializer.data,code=code.CODE_SUCCESS)
+        except ObjectDoesNotExist:
+            return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST,msg='接口不存在')
 
 
 class AddAPI(APIView):
@@ -130,3 +155,39 @@ class AddAPI(APIView):
                     return JsonResponse(code=code.CODE_SUCCESS,data={'api_id':api_id})
                 return JsonResponse(code=code.CODE_Failed)
 
+
+class UpdateAPI(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = ()
+
+    def post(self,request):
+        """
+        修改接口
+        :param request:
+        :return:
+        """
+        data=JSONParser().parse(request)
+        project=get_availability_project(data,request.user)
+        result=all_parameter_check(data) if isinstance(project,Project) else project
+        if result:
+            return result
+        try:
+            api=APIInfo.objects.get(id=data['id'])
+        except ObjectDoesNotExist:
+            return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST,msg='接口不存在')
+        with transaction.atomic():
+            serializer=APIInfoDeserializer(data=data)
+            if serializer.is_valid():
+                data['update_user']=request.user
+                try:
+                    if not isinstance(data.get('api_group_id'),int):
+                        return JsonResponse(code=code.CODE_PARAMETER_ERROR)
+                    APIGroup.objects.get(id=data['api_group_id'],project=data['project_id'])
+                    User.objects.get(id=request.user.pk)
+                    serializer.update(instance=api,validated_data=data)
+                except KeyError:
+                    User.objects.get(id=request.user.pk)
+                    serializer.update(instance=api,validated_data=data)
+                except ObjectDoesNotExist:
+                    return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST,msg='分组不存在')
+                header=Q()
