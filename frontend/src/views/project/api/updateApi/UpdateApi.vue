@@ -367,33 +367,33 @@
                         if (data.code === '999999') {
                             data = data.data;
                             self.id = data.id;
-                            self.form.firstGroup = data.apiGroupLevelFirst;
+                            self.form.firstGroup = data.api_group;
                             self.form.name = data.name;
                             if (data.status) {
                                 self.form.status = true;
                             } else {
                                 self.form.status = false
                             }
-                            self.form.request4 = data.requestType;
-                            self.form.Http4 = data.httpType;
-                            self.form.addr = data.apiAddress;
+                            self.form.request4 = data.request_type;
+                            self.form.Http4 = data.http_type;
+                            self.form.addr = data.api_address;
                             if (data.headers.length) {
                                 self.form.head = data.headers;
                             }
                             try {
-                                self.parameterRaw = data.requestParameterRaw.data.replace(/'/g, "\"").replace(/None/g, "null").replace(/True/g, "true").replace(/False/g, "false");
+                                self.parameterRaw = data.request_parameter_raw.data.replace(/'/g, "\"").replace(/None/g, "null").replace(/True/g, "true").replace(/False/g, "false");
                             } catch (e){
 
                             }
-                            if (data.requestParameter.length) {
-                                self.form.parameter = data.requestParameter;
+                            if (data.request_parameters.length) {
+                                self.form.parameter = data.request_parameters;
                             }
-                            self.form.parameterType = data.requestParameterType;
+                            self.form.parameterType = data.request_parameter_type;
                             self.radio = self.form.parameterType;
                             if (data.response.length) {
                                 self.form.response = data.response;
                             }
-                            self.form.mockCode = data.mockCode;
+                            self.form.mockCode = data.mock_code;
                             self.form.mockData = data.data;
                             if (data.data) {
                                 self.form.mockJsonData = JSON.parse(data.data)
@@ -453,17 +453,17 @@
                             let param = JSON.stringify({
                                 project_id: Number(self.$route.params.project_id),
                                 id: Number(self.$route.params.api_id),
-                                apiGroupLevelFirst_id: Number(self.form.firstGroup),
+                                api_group_id: Number(self.form.firstGroup),
                                 name: self.form.name,
-                                httpType: self.form.Http4,
-                                requestType: self.form.request4,
-                                apiAddress: self.form.addr,
+                                http_type: self.form.Http4,
+                                request_type: self.form.request4,
+                                api_address: self.form.addr,
                                 status: self.form.status,
                                 headDict: self.form.head,
-                                requestParameterType: _type,
+                                request_parameter_type: _type,
                                 requestList: _parameter,
                                 responseList: self.form.response,
-                                mockCode: self.form.mockCode,
+                                mock_code: self.form.mockCode,
                                 data: self.form.mockData,
                                 description: ''
                             });

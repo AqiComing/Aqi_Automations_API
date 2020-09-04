@@ -267,9 +267,9 @@
                     success: (data) => {
 
                         if (data.code === '999999') {
-                            self.form.request4 = data.data.requestType;
-                            self.form.Http4 = data.data.httpType.toLowerCase();
-                            self.form.addr = data.data.apiAddress;
+                            self.form.request4 = data.data.request_type;
+                            self.form.Http4 = data.data.http_type.toLowerCase();
+                            self.form.addr = data.data.api_address;
                             if (data.data.headers.length) {
                                 data.data.headers.forEach((item) => {
                                     self.form.head.push(item);
@@ -280,8 +280,8 @@
                                     self.form.head.push(item);
                                 });
                             }
-                            if (data.data.requestParameter.length) {
-                                data.data.requestParameter.forEach((item) => {
+                            if (data.data.request_parameters.length) {
+                                data.data.request_parameters.forEach((item) => {
                                     self.form.parameter.push(item);
                                 });
                             } else {
@@ -292,12 +292,12 @@
                                 });
                             }
                             try {
-                                self.form.parameterRaw = data.data.requestParameterRaw[0].data;
+                                self.form.parameterRaw = data.data.request_parameter_raw[0].data;
                             } catch (e) {
 
                             }
-                            self.form.parameterType = data.data.requestParameterType;
-                            self.radio = data.data.requestParameterType;
+                            self.form.parameterType = data.data.request_parameter_type;
+                            self.radio = data.data.request_parameter_type;
                             self.toggleHeadSelection(self.form.head);
                             self.toggleParameterSelection(self.form.parameter);
                         }

@@ -3,7 +3,7 @@
         <div style="border: 1px solid #e6e6e6;margin-bottom: 10px;padding:15px">
             <el-row :span="24">
                 <el-col :span="2" style="padding-left: 6px; padding-right: 6px;">
-                    <div class="httpStyle" v-model="httpType">{{httpType}}</div>
+                    <div class="httpStyle" v-model="http_type">{{http_type}}</div>
                 </el-col>
                 <el-col :span="2" style="padding-left: 6px;">
                     <div class="httpStyle" v-model="requestType">{{requestType}}</div>
@@ -166,7 +166,7 @@
             return {
                 activeNames: ['1', '2', '3', '4'],
                 id: "",
-                httpType: "",
+                http_type: "",
                 requestType: "",
                 addr: "",
                 apiName: "",
@@ -220,22 +220,22 @@
                         if (data.code === '999999') {
                             data = data.data;
                             self.id = data.id;
-                            self.httpType = data.httpType;
-                            self.requestType = data.requestType;
-                            self.addr = data.apiAddress;
+                            self.http_type = data.http_type;
+                            self.requestType = data.request_type;
+                            self.addr = data.api_address;
                             self.apiName = data.name;
-                            self.updateTime = data.lastUpdateTime;
+                            self.updateTime = data.last_update_time;
                             self.status = data.status;
                             self.head = data.headers;
-                            self.parameterType = data.requestParameterType;
-                            self.parameter = data.requestParameter;
+                            self.parameterType = data.request_parameter_type;
+                            self.parameter = data.request_parameters;
                             try {
-                                self.parameterRaw = data.requestParameterRaw.data;
+                                self.parameterRaw = data.request_parameter_raw.data;
                             } catch (e){
 
                             }
                             self.response = data.response;
-                            self.mockCode = data.mockCode;
+                            self.mockCode = data.mock_code;
                             self.mockData = data.data;
                             if (data.data) {
                                 self.mockJsonData = JSON.parse(data.data)

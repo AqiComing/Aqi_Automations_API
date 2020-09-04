@@ -283,3 +283,44 @@ class APIResponse(models.Model):
     class Meta:
         verbose_name = '返回参数'
         verbose_name_plural = '返回参数管理'
+
+
+class TestCaseGroup(models.Model):
+    id=models.AutoField(primary_key=True)
+    project=models.ForeignKey(Project,on_delete=models.CASCADE,verbose_name='项目')
+    name=models.CharField(max_length=50,verbose_name='测试用例分组')
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name="测试用例分组"
+        verbose_name_plural="测试用例分组管理"
+
+
+class AutomationTestCase(models.Model):
+    """
+    自动化测试用例
+    """
+    id=models.AutoField(primary_key=True)
+    project=models.ForeignKey(Project,on_delete=models.CASCADE,verbose_name='所属项目')
+    test_case_group = models.ForeignKey(TestCaseGroup, blank=True, null=True, on_delete=models.SET_NULL,
+                                        verbose_name='所属用例分组', related_name='test_case_group')
+    case_name=models.CharField(max_length=50,verbose_name='用例名称')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='创建人',
+                             related_name='create_user')
+    description=models.CharField(max_length=1024,blank=True,null=True,verbose_name='描述')
+    update_time=models.DateTimeField(auto_now=True,verbose_name='更新时间')
+
+    def __unicode__(self):
+        return self.case_name
+
+    def __str__(self):
+        return self.case_name
+
+    class Meta:
+        verbose_name='自动化测试用例'
+        verbose_name_plural='自动测试用'

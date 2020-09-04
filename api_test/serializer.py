@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from api_test.models import Project, ProjectDynamic, GlobalHost, ReportSenderConfig, ProjectMember, APIGroup, APIHead, \
-    APIParameter, APIParameterRaw, APIResponse, APIInfo
+    APIParameter, APIParameterRaw, APIResponse, APIInfo, TestCaseGroup, AutomationTestCase
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -43,7 +43,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                   'dynamicCount', 'memberCount', 'description', 'owner')
 
     def get_apiCount(self, obj):
-        return 0
+        return obj.api_project.all().count()
 
     def get_dynamicCount(self, obj):
         return obj.dynamic_project.all().count()
@@ -175,7 +175,7 @@ class APIInfoSerializer(serializers.ModelSerializer):
     """
     last_update_time=serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
     headers=APIHeadSerializer(many=True,read_only=True)
-    request_parameter=APIHeadSerializer(many=True,read_only=True)
+    request_parameters=APIParameterSerializer(many=True,read_only=True)
     response=APIResponseSerializer(many=True,read_only=True)
     request_parameter_raw=APIParameterRawSerializer(many=False,read_only=True)
     update_user=serializers.CharField(source='update_user.first_name')
@@ -183,7 +183,7 @@ class APIInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model=APIInfo
         fields=('id','api_group','name','http_type','request_type','api_address','headers',
-                'request_parameter_type','request_parameter','request_parameter_raw','status',
+                'request_parameter_type','request_parameters','request_parameter_raw','status',
                 'response','mock_code','data','last_update_time','update_user','description')
 
 
@@ -204,3 +204,36 @@ class APIInfoListSerializer(serializers.ModelSerializer):
     class Meta:
         model=APIInfo
         fields=('id','name','request_type','api_address','mock_status','last_update_time','update_user')
+
+
+class TestCaseGroupSerializer(serializers.ModelSerializer):
+    """
+    测试用例分组序列化
+    """
+    class Meta:
+        model=TestCaseGroup
+        fields=('id','project_id','name')
+
+
+class TestCaseSerializer(serializers.ModelSerializer):
+    """
+    自动化测试用例序列化
+    """
+    update_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    create_user = serializers.CharField(source='user.first_name')
+
+    class Meta:
+        model=AutomationTestCase
+        fields=('id','test_case_group','case_name','create_user','description','update_time')
+
+
+class TestCaseDeserializer(serializers.ModelSerializer):
+    """
+    自动化测试用例反序列化
+    """
+    class Meta:
+        model=AutomationTestCase
+        fields = ('id', 'project_id','test_case_group', 'case_name', 'create_user', 'description', 'update_time')
+
+
+

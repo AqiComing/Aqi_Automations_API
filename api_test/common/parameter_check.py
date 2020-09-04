@@ -5,6 +5,19 @@ from api_test.common.api_response import JsonResponse
 from api_test.models import Project
 
 
+def parameter_id_check(data):
+    """
+    检查 projrct id, id
+    :param data:
+    :return:
+    """
+    try:
+        if not isinstance(data['project_id'],int) or not isinstance(data['id'],int):
+            return JsonResponse(code=code.CODE_PARAMETER_ERROR)
+    except KeyError:
+        return JsonResponse(code=code.CODE_KEY_ERROR)
+
+
 def parameter_ids_check(data):
     """
     检查传入项目id或者id列表参数可用性

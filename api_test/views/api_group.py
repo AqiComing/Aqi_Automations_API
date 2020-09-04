@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from api_test.common import code
 from api_test.common.api_response import JsonResponse
 from api_test.common.common import get_availability_project, record_dynamic, check_project_status
+from api_test.common.parameter_check import parameter_id_check
 from api_test.models import APIGroup, Project
 from api_test.serializer import APIGroupSerializer
 
@@ -14,21 +15,9 @@ def check_name_parameter(data):
     try:
         if not data['name']:
             return JsonResponse(code=code.CODE_PARAMETER_ERROR,msg='组名不能为空')
-        same_name_group=APIGroup.objects.filter(name=data['name']).exclude(project=data['project_id'])
+        same_name_group=APIGroup.objects.filter(name=data['name'],project=data['project_id'])
         if same_name_group:
             return JsonResponse(code=code.CODE_EXIST_SAME_NAME,msg='存在同名分组')
-    except KeyError:
-        return JsonResponse(code=code.CODE_KEY_ERROR)
-
-def parameter_id_check(data):
-    """
-    检查 projrct id,group id
-    :param data:
-    :return:
-    """
-    try:
-        if not isinstance(data['project_id'],int) or not isinstance(data['id'],int):
-            return JsonResponse(code=code.CODE_PARAMETER_ERROR)
     except KeyError:
         return JsonResponse(code=code.CODE_KEY_ERROR)
 

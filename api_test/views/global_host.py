@@ -25,6 +25,7 @@ def all_parameter_check(data):
     except KeyError:
         return JsonResponse(code=code.CODE_KEY_ERROR)
 
+
 def parameter_id_check(data):
     """
     验证host/project id
