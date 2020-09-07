@@ -64,8 +64,8 @@
         </el-dialog>
         <el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false" style="width: 65%; left: 17.5%">
             <el-form :model="editForm"  :rules="editFormRules" ref="editForm" label-width="80px">
-                <el-form-item label="名称" prop="caseName">
-                    <el-input v-model.trim="editForm.caseName" auto-complete="off"></el-input>
+                <el-form-item label="名称" prop="case_name">
+                    <el-input v-model.trim="editForm.case_name" auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="接口分组:" label-width="83px" prop="automationGroupLevelFirst">
                     <el-select v-model="editForm.automationGroupLevelFirst" placeholder="分组">
@@ -85,8 +85,8 @@
         <!--新增界面-->
         <el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false" style="width: 65%; left: 17.5%">
             <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-                <el-form-item label="名称" prop="caseName">
-                    <el-input v-model.trim="addForm.caseName" auto-complete="off"></el-input>
+                <el-form-item label="名称" prop="case_name">
+                    <el-input v-model.trim="addForm.case_name" auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="接口分组:" label-width="83px" prop="firstGroup">
                     <el-select v-model="addForm.firstGroup" placeholder="分组">
@@ -121,17 +121,17 @@
         <el-table :data="Case" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
             <el-table-column type="selection" min-width="5%">
             </el-table-column>
-            <el-table-column prop="caseName" label="用例名称" min-width="20%" sortable show-overflow-tooltip>
+            <el-table-column prop="case_name" label="用例名称" min-width="20%" sortable show-overflow-tooltip>
                 <template slot-scope="scope">
-                    <el-icon name="caseName"></el-icon>
-                    <router-link :to="{ name: '用例接口列表', params: {case_id: scope.row.id}}" style='text-decoration: none;'>{{ scope.row.caseName }}</router-link>
+                    <el-icon name="case_name"></el-icon>
+                    <router-link :to="{ name: '用例接口列表', params: {case_id: scope.row.id}}" style='text-decoration: none;'>{{ scope.row.case_name }}</router-link>
                 </template>
             </el-table-column>
             <el-table-column prop="description" label="描述" min-width="35%" sortable show-overflow-tooltip>
             </el-table-column>
-            <el-table-column prop="createUser" label="创建人" min-width="10%" sortable show-overflow-tooltip>
+            <el-table-column prop="create_user" label="创建人" min-width="10%" sortable show-overflow-tooltip>
             </el-table-column>
-            <el-table-column prop="updateTime" label="更新日期" min-width="15%" sortable show-overflow-tooltip>
+            <el-table-column prop="update_time" label="更新日期" min-width="15%" sortable show-overflow-tooltip>
             </el-table-column>
             <el-table-column label="操作" min-width="15%">
                 <template slot-scope="scope">
@@ -256,7 +256,7 @@
                 editFormVisible: false,//编辑界面是否显示
                 editLoading: false,
                 editFormRules: {
-                    caseName: [
+                    case_name: [
                         { required: true, message: '请输入名称', trigger: 'blur' },
                         { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
                     ],
@@ -270,7 +270,7 @@
                 },
                 //编辑界面数据
                 editForm: {
-                    caseName: '',
+                    case_name: '',
                     automationGroupLevelFirst: '',
                     description: ''
                 },
@@ -278,7 +278,7 @@
                 addFormVisible: false,//新增界面是否显示
                 addLoading: false,
                 addFormRules: {
-                    caseName: [
+                    case_name: [
                         { required: true, message: '请输入名称', trigger: 'blur' },
                         { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
                     ],
@@ -292,7 +292,7 @@
                 },
                 //新增界面数据
                 addForm: {
-                    caseName: '',
+                    case_name: '',
                     firstGroup: '',
                     description: ''
                 }
@@ -518,7 +518,7 @@
                 let self = this;
                 let param = { project_id: this.$route.params.project_id, page: self.page, name: self.filters.name};
                 if (this.$route.params.firstGroup) {
-                    param['first_group_id'] = this.$route.params.firstGroup;
+                    param['test_case_group_id'] = this.$route.params.firstGroup;
                     if (this.$route.params.secondGroup) {
                         param['second_group_id'] = this.$route.params.secondGroup
                     }
@@ -559,7 +559,7 @@
                     //NProgress.start();
                     let params = JSON.stringify({
                         project_id: Number(this.$route.params.project_id),
-                        automationGroupLevelFirst_id: self.updateGroupForm.firstGroup,
+                        test_case_group_id: self.updateGroupForm.firstGroup,
                         ids:ids
                     });
                     $.ajax({
@@ -743,7 +743,7 @@
                             let param = JSON.stringify({
                                 project_id: Number(this.$route.params.project_id),
                                 id: Number(self.editForm.id),
-                                caseName: self.editForm.caseName,
+                                case_name: self.editForm.case_name,
                                 automationGroupLevelFirst_id: Number(this.editForm.automationGroupLevelFirst),
                                 description: self.editForm.description });
                             $.ajax({
@@ -793,8 +793,8 @@
                             //NProgress.start();
                             let param = JSON.stringify({
                                 project_id: Number(this.$route.params.project_id),
-                                automationGroupLevelFirst_id: this.addForm.firstGroup,
-                                caseName: self.addForm.caseName,
+                                test_case_group_id: this.addForm.firstGroup,
+                                case_name: self.addForm.case_name,
                                 description: self.addForm.description });
                             $.ajax({
                                 type: "post",

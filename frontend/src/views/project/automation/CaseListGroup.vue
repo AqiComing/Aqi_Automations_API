@@ -76,17 +76,17 @@
         <el-table :data="Case" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
             <el-table-column type="selection" min-width="5%">
             </el-table-column>
-            <el-table-column prop="caseName" label="用例名称" min-width="20%" sortable show-overflow-tooltip>
+            <el-table-column prop="case_name" label="用例名称" min-width="20%" sortable show-overflow-tooltip>
                 <template slot-scope="scope">
-                    <el-icon name="caseName"></el-icon>
-                    <router-link :to="{ name: '用例接口列表', params: {case_id: scope.row.id}}" style='text-decoration: none;'>{{ scope.row.caseName }}</router-link>
+                    <el-icon name="case_name"></el-icon>
+                    <router-link :to="{ name: '用例接口列表', params: {case_id: scope.row.id}}" style='text-decoration: none;'>{{ scope.row.case_name }}</router-link>
                 </template>
             </el-table-column>
             <el-table-column prop="description" label="描述" min-width="35%" sortable show-overflow-tooltip>
             </el-table-column>
-            <el-table-column prop="createUser" label="创建人" min-width="10%" sortable show-overflow-tooltip>
+            <el-table-column prop="create_user" label="创建人" min-width="10%" sortable show-overflow-tooltip>
             </el-table-column>
-            <el-table-column prop="updateTime" label="更新日期" min-width="15%" sortable show-overflow-tooltip>
+            <el-table-column prop="update_time" label="更新日期" min-width="15%" sortable show-overflow-tooltip>
             </el-table-column>
             <el-table-column label="操作" min-width="15%">
                 <template slot-scope="scope">
@@ -184,7 +184,7 @@
                 let self = this;
                 let param = { project_id: this.$route.params.project_id, page: self.page, name: self.filters.name};
                 if (this.$route.params.firstGroup) {
-                    param['first_group_id'] = this.$route.params.firstGroup;
+                    param['test_case_group_id'] = this.$route.params.firstGroup;
                     if (this.$route.params.secondGroup) {
                         param['second_group_id'] = this.$route.params.secondGroup
                     }
@@ -225,7 +225,7 @@
                     //NProgress.start();
                     let params = JSON.stringify({
                         project_id: Number(this.$route.params.project_id),
-                        automationGroupLevelFirst_id: self.updateGroupForm.firstGroup,
+                        test_case_group_id: self.updateGroupForm.firstGroup,
                         ids:ids
                     });
                     $.ajax({
@@ -246,7 +246,7 @@
                                     center: true,
                                     type: 'success'
                                 });
-                                self.$router.push({ name: '分组用例列表', params: { project_id: self.$route.params.project_id, firstGroup: self.updateGroupForm.firstGroup}});
+                                self.$router.push({ name: '分组用例列表', params: { project_id: self.$route.params.project_id, test_case_group_id: self.updateGroupForm.firstGroup}});
                             }
                             else {
                                 self.$message.error({

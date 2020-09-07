@@ -233,7 +233,7 @@ class TestCaseDeserializer(serializers.ModelSerializer):
     """
     class Meta:
         model=AutomationTestCase
-        fields = ('id', 'project_id','test_case_group', 'case_name', 'create_user', 'description', 'update_time')
+        fields = ('id', 'project_id','test_case_group', 'case_name', 'user', 'description', 'update_time')
 
 
 
