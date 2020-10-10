@@ -30,6 +30,14 @@ HTTP_CODE_CHOICE=(
     ('500','500'),
     ('502','502'),
 )
+
+EXAMINE_TYPE_CHOICE=(
+    ('no_check','不校验'),
+    ('only_check_status','校验http状态'),
+    ('json','JSON校验'),
+    ('entirely_check','完全校验'),
+    ('regular_check','正则校验')
+)
 PARAMETER_TYPE_CHOICE=(('Int','Int'),('String','String'))
 
 """
@@ -324,3 +332,112 @@ class AutomationTestCase(models.Model):
     class Meta:
         verbose_name='自动化测试用例'
         verbose_name_plural='自动测试用'
+
+
+class AutomationCaseApi(models.Model):
+    """
+    用例执行接口
+    """
+    id=models.AutoField(primary_key=True)
+    automation_test_case=models.ForeignKey(AutomationTestCase,on_delete=models.CASCADE,verbose_name='用例',related_name='api')
+
+    name=models.CharField(max_length=50,verbose_name='接口名称')
+    http_type=models.CharField(max_length=50,default='HTTP',verbose_name='HTTP/HTTPS',choices=HTTP_CHOICE)
+    request_type=models.CharField(max_length=50,verbose_name='请求方式',choices=REQUEST_TYPE_CHOICE)
+    api_address=models.CharField(max_length=1024,verbose_name='接口地址')
+    request_parameter_type=models.CharField(max_length=50,verbose_name='参数请求格式',choices=REQUEST_PARAMETER_TYPE_CHOICE)
+    format_raw=models.BooleanField(default=False,verbose_name='是否转换位源数据')
+    examine_type=models.CharField(default='no_check',max_length=50,verbose_name='校验方式',choices=EXAMINE_TYPE_CHOICE)
+    http_code=models.CharField(max_length=50,blank=True,null=True,verbose_name='HTTP状态',choices=HTTP_CODE_CHOICE)
+    response_code=models.TextField(blank=True,null=True,verbose_name='返回内容')
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name='用例接口'
+        verbose_name_plural='用例接口管理'
+
+
+class AutomationHead(models.Model):
+    """
+    用例接口请求头
+    """
+    id=models.AutoField(primary_key=True)
+    automation_case_api = models.ForeignKey(AutomationCaseApi, related_name='header', on_delete=models.CASCADE,
+                                            verbose_name='接口')
+    name=models.CharField(max_length=1024,verbose_name='参数名')
+    value=models.CharField(max_length=1024,verbose_name='内容',blank=True,null=True)
+    interrelate=models.BooleanField(default=False,verbose_name='是否关联')
+
+    def __unicode__(self):
+        return self.value
+
+    class Meta:
+        verbose_name='请求头'
+        verbose_name_plural='请求头管理'
+
+
+class AutomationParameter(models.Model):
+    """
+    请求参数
+    """
+    id=models.AutoField(primary_key=True)
+    automation_case_api = models.ForeignKey(AutomationCaseApi, related_name='parameter_list', on_delete=models.CASCADE,
+                                            verbose_name='接口')
+    name=models.CharField(max_length=1024,verbose_name='参数名')
+    value=models.CharField(max_length=1024,verbose_name='内容',blank=True,null=True)
+    interrelate=models.BooleanField(default=False,verbose_name='是否关联')
+
+    def __unicode__(self):
+        return self.value
+
+    class Meta:
+        verbose_name='接口参数'
+        verbose_name_plural='接口参数管理'
+
+
+class AutomationParameterRaw(models.Model):
+    """
+    请求的源数据参数
+    """
+    id=models.AutoField(primary_key=True)
+    automation_case_api = models.ForeignKey(AutomationCaseApi, related_name='parameter_raw', on_delete=models.CASCADE,
+                                            verbose_name='接口')
+    data=models.TextField(verbose_name="请求参数源数据",blank=True,null=True)
+
+    class Meta:
+        verbose_name="请求参数源数据"
+        verbose_name_plural="请求参数源数据管理"
+
+
+class AutomationResponseJson(models.Model):
+    """
+    返回json参数
+    """
+    id=models.AutoField(primary_key=True)
+    automation_case_api = models.ForeignKey(AutomationCaseApi, related_name='response', on_delete=models.CASCADE,
+                                            verbose_name='接口')
+    name=models.CharField(max_length=1024,verbose_name='JSON参数',blank=True,null=True)
+    tier=models.CharField(max_length=1024,verbose_name='层级关系',blank=True,null=True)
+    type=models.CharField(max_length=1024,verbose_name='关联类型',default='json',choices=(('json','json'),('Regular','Regular')))
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name='结果JSON参数'
+        verbose_name_plural='结果JSON参数管理'
+
+
+class AutomationTestResult(models.Model):
+    """
+    手动执行结果
+    """
+    id=models.AutoField(primary_key=True)
+    automation_case_api = models.ForeignKey(AutomationCaseApi, related_name='test_result', on_delete=models.CASCADE,
+                                            verbose_name='接口')
+    # url=models.CharField(max_length=)

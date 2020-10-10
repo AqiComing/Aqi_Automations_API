@@ -236,4 +236,9 @@ class TestCaseDeserializer(serializers.ModelSerializer):
         fields = ('id', 'project_id','test_case_group', 'case_name', 'user', 'description', 'update_time')
 
 
+class AutomationCaseApiSerializer(serializers.ModelSerializer):
+    """
+    自动化用例接口详细信息序列化
+    """
+    # header=AutomationHeadSerializer
 
