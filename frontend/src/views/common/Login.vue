@@ -1,17 +1,17 @@
 <template>
     <div class="homeBox">
         <ul class="tyg-div">
-            <li>让</li>
-            <li><div style="margin-left:20px;">测</div></li>
-            <li><div style="margin-left:40px;">试</div></li>
-            <li><div style="margin-left:60px;">变</div></li>
-            <li><div style="margin-left:80px;">得</div></li>
-            <li><div style="margin-left:100px;">轻</div></li>
-            <li><div style="margin-left:120px;">松</div></li>
+            <li></li>
+            <li><div style="margin-left:20px;"></div></li>
+            <li><div style="margin-left:40px;"></div></li>
+            <li><div style="margin-left:60px;"></div></li>
+            <li><div style="margin-left:80px;"></div></li>
+            <li><div style="margin-left:100px;"></div></li>
+            <li><div style="margin-left:120px;"></div></li>
         </ul>
         <div style="width:32%;height: auto;margin-left: 30%">
             <div class="title0">自动化测试平台</div>
-            <div class="title1">项目管理、接口管理、用例管理、测试报告、任务设置</div>
+            <div class="title1">hello world!</div>
             <div class="lun-container">
                 <div class="carouse" id="carouse">
                     <div class="pic1"><img src="../../assets/page1_0.png" alt="pic1"></div>
@@ -19,7 +19,7 @@
                     <div class="pic3"><img src="../../assets/page1_2.png" alt="pic3"></div>
                 </div>
             </div>
-            <img class="img-login" src="../../assets/page1_3.jpg"/>
+            <img class="img-login" src="../../assets/page1_3.replace.jpg"/>
         </div>
         <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-position="left" label-width="0px" class="demo-ruleForm login-container">
             <h3 class="title">系统登录</h3>

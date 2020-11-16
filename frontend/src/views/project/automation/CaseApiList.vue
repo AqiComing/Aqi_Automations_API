@@ -62,7 +62,7 @@
             </el-table-column>
             <el-table-column prop="address" label="接口地址" min-width="50%" sortable show-overflow-tooltip>
                 <template slot-scope="scope">
-                    <span class="HttpStatus">{{scope.row.requestType}}</span><span style="font-size: 16px">{{scope.row.apiAddress}}</span>
+                    <span class="HttpStatus">{{scope.row.request_type}}</span><span style="font-size: 16px">{{scope.row.api_address}}</span>
                 </template>
             </el-table-column>
             <el-table-column prop="result" label="测试结果" min-width="10%" sortable show-overflow-tooltip>

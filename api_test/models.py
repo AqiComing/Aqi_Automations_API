@@ -227,6 +227,9 @@ class APIInfo(models.Model):
 
 
 class APIHead(models.Model):
+    """
+    接口请求头
+    """
     id=models.AutoField(primary_key=True)
     api=models.ForeignKey(APIInfo,on_delete=models.CASCADE,verbose_name='所属接口',related_name='headers')
     name=models.CharField(max_length=1024,verbose_name='消息头')

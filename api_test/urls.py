@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
-from api_test.views import user, project, dynamic, global_host, member, api_group, api, test_case_group, test_case
+from api_test.views import user, project, dynamic, global_host, member, api_group, api, test_case_group, test_case, \
+    test_case_api
 
 urlpatterns=[
     url(r'user/login',user.ObtainAuthToken.as_view()),
@@ -40,5 +41,8 @@ urlpatterns=[
     url(r'automation/del_case', test_case.DelCase.as_view()),
     url(r'automation/update_case/$', test_case.UpdateCase.as_view()),
     url(r'automation/update_case_group', test_case.UpdateCaseGroup.as_view()),
+    url(r'automation/api_list',test_case_api.ApiList.as_view()),
+    url(r'automation/api_list',test_case_api.ApiList.as_view()),
+    url(r'automation/add_old_api',test_case_api.AddOldApi.as_view()),
 
 ]

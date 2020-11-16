@@ -86,9 +86,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'aqi_api',
-        'USER': 'root',
+        'USER': 'zhaoqi',
         'PASSWORD': 'zhaoqi',
-        'HOST': '127.0.0.1',
+        'HOST': '192.168.11.200',
         'PORT': '3306',
     }
 }

@@ -2,7 +2,8 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from api_test.models import Project, ProjectDynamic, GlobalHost, ReportSenderConfig, ProjectMember, APIGroup, APIHead, \
-    APIParameter, APIParameterRaw, APIResponse, APIInfo, TestCaseGroup, AutomationTestCase
+    APIParameter, APIParameterRaw, APIResponse, APIInfo, TestCaseGroup, AutomationTestCase, AutomationCaseApi, \
+    AutomationHead, AutomationParameter, AutomationParameterRaw, AutomationResponseJson
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -236,9 +237,70 @@ class TestCaseDeserializer(serializers.ModelSerializer):
         fields = ('id', 'project_id','test_case_group', 'case_name', 'user', 'description', 'update_time')
 
 
+class AutomationCaseApiListSerializer(serializers.ModelSerializer):
+    """
+    用例接口列表信息序列化
+    """
+    class Meta:
+        model=AutomationCaseApi
+        fields=('id','name','request_type','api_address')
+
+
+class AutomationHeadSerializer(serializers.ModelSerializer):
+    """
+    测试用例接口请求头信息序列化
+    """
+    class Meta:
+        model=AutomationHead
+        fields=('id','automation_case_api_id','name','value','interrelate')
+
+
+class AutomationParameterSerializer(serializers.ModelSerializer):
+    """
+    测试用例接口参数序列化
+    """
+    class Meta:
+        model=AutomationParameter
+        fields=('id','automation_case_api_id','name','value','interrelate')
+
+
+class AutomationParameterRawSerializer(serializers.ModelSerializer):
+    """
+    测试用例接口源参数序列化
+    """
+    class Meta:
+        model=AutomationParameterRaw
+        fields=('id','automation_case_api_id','data')
+
+
+class AutomationResponseJsonSerializer(serializers.ModelSerializer):
+    """
+    返回参数json序列化
+    """
+    class Meta:
+        model=AutomationResponseJson
+        fields=('id','automation_case_api','name','tier')
+
+
 class AutomationCaseApiSerializer(serializers.ModelSerializer):
     """
     自动化用例接口详细信息序列化
     """
-    # header=AutomationHeadSerializer
+    header=AutomationHeadSerializer(many=True,read_only=True)
+    parameter_list=AutomationParameterSerializer(many=True,read_only=True)
+    parameter_raw=AutomationParameterRawSerializer(many=True,read_only=True)
 
+    class Meta:
+        model=AutomationCaseApi
+        fields=('id','name','http_type','request_type','api_address','header','request_parameter_type','format_raw',
+                'parameter_list','parameter_raw','examine_type','http_code','response_code')
+
+
+class AutomationCaseApiDesSerializer(serializers.ModelSerializer):
+    """
+    自动化用例接口详细信息序列化
+    """
+    class Meta:
+        model=AutomationCaseApi
+        fields=('id','automation_test_case_id','name','http_type','request_type','api_address',
+                'format_raw','examine_type','http_code','response_code')

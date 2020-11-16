@@ -410,7 +410,7 @@
                                 project_id: Number(this.$route.params.project_id),
                                 id: Number(self.editForm.id),
                                 caseName: self.editForm.caseName,
-                                automationGroupLevelFirst_id: Number(this.editForm.automationGroupLevelFirst),
+                                test_case_group_id: Number(this.editForm.automationGroupLevelFirst),
                                 description: self.editForm.description });
                             $.ajax({
                                 type: "post",
@@ -459,7 +459,7 @@
                             //NProgress.start();
                             let param = JSON.stringify({
                                 project_id: Number(this.$route.params.project_id),
-                                automationGroupLevelFirst_id: this.addForm.firstGroup,
+                                test_case_group_id: this.addForm.firstGroup,
                                 caseName: self.addForm.caseName,
                                 description: self.addForm.description });
                             $.ajax({

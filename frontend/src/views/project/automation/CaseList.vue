@@ -744,7 +744,7 @@
                                 project_id: Number(this.$route.params.project_id),
                                 id: Number(self.editForm.id),
                                 case_name: self.editForm.case_name,
-                                automationGroupLevelFirst_id: Number(this.editForm.automationGroupLevelFirst),
+                                test_case_group_id: Number(this.editForm.automationGroupLevelFirst),
                                 description: self.editForm.description });
                             $.ajax({
                                 type: "post",
