@@ -6,7 +6,7 @@ from rest_framework.parsers import JSONParser
 
 from api_test.common import code
 from api_test.common.api_response import JsonResponse
-from api_test.models import Project
+from api_test.models import Project, AutomationResponseJson
 from api_test.serializer import ProjectDynamicDeserializer, ProjectSerializer
 
 
@@ -87,4 +87,16 @@ def objects_paginator(request,objects):
     return{"obm":obm,"page":page,"total":total}
 
 
-
+def create_json(api_id,api,data):
+    """
+    根据json数据生成关联接口
+    :param api_id: 接口id
+    :param api: 格式化api数据
+    :param data: Json数据
+    :return:
+    """
+    if isinstance(data,dict):
+        for i in data:
+            m=(api+"[\"%s\"]"%i)
+            AutomationResponseJson(automation_case_api=api_id,name=i,tier=m,type='json').save()
+            create_json(api,m,data[i])

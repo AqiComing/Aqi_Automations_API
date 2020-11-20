@@ -363,19 +363,19 @@
                             }
                             let param = JSON.stringify({
                                 project_id: Number(self.$route.params.project_id),
-                                automationTestCase_id: Number(self.$route.params.case_id),
+                                automation_case_api_id: Number(self.$route.params.case_id),
                                 name: self.form.name,
-                                httpType: self.form.Http4,
-                                requestType: self.form.request4,
-                                apiAddress: self.form.addr,
-                                headDict: self.form.head,
-                                requestParameterType: _type,
-                                formatRaw: formatRaw,
-                                requestList: _parameter,
-                                examineType: self.form.check,
-                                RegularParam: self.form.RegularParam,
-                                httpCode: self.form.checkHttp,
-                                responseData: self.form.checkData.toString()
+                                http_type: self.form.Http4,
+                                request_type: self.form.request4,
+                                api_address: self.form.addr,
+                                head_dict: self.form.head,
+                                request_parameter_type: _type,
+                                format_raw: formatRaw,
+                                parameter_raw: _parameter,
+                                examine_type: self.form.check,
+                                regular_param: self.form.RegularParam,
+                                http_code: self.form.checkHttp,
+                                response_data: self.form.checkData.toString()
                             });
                             $.ajax({
                                 type: "post",

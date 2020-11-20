@@ -42,7 +42,10 @@ urlpatterns=[
     url(r'automation/update_case/$', test_case.UpdateCase.as_view()),
     url(r'automation/update_case_group', test_case.UpdateCaseGroup.as_view()),
     url(r'automation/api_list',test_case_api.ApiList.as_view()),
-    url(r'automation/api_list',test_case_api.ApiList.as_view()),
+    url(r'automation/api_info',test_case_api.CaseAPIInfo.as_view()),
     url(r'automation/add_old_api',test_case_api.AddOldApi.as_view()),
+    url(r'automation/add_new_api',test_case_api.AddNewAPI.as_view()),
+    url(r'automation/del_api',test_case_api.DelAPI.as_view()),
+
 
 ]
