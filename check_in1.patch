@@ -1,0 +1,69 @@
+Index: api_test/serializer.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- api_test/serializer.py	(revision beb4c982b0a9a9ff6f24400934a15514f4631d65)
++++ api_test/serializer.py	(date 1597991299866)
+@@ -1,7 +1,7 @@
+ from django.contrib.auth.models import User
+ from rest_framework import serializers
+ from rest_framework.authtoken.models import Token
+-from api_test.models import Project, ProjectDynamic, GlobalHost
++from api_test.models import Project, ProjectDynamic, GlobalHost, ReportSenderConfig, ProjectMember
+ 
+ 
+ class TokenSerializer(serializers.ModelSerializer):
+@@ -48,7 +48,7 @@
+         return obj.dynamic_project.all().count()
+ 
+     def get_memberCount(self, obj):
+-        return 0
++        return obj.member_project.all().count()
+ 
+ 
+ class ProjectDeserializer(serializers.ModelSerializer):
+@@ -83,6 +83,41 @@
+     """
+     HOST序列化
+     """
++
+     class Meta:
+-        model=GlobalHost
+-        fields=('id','project_id','name','host','status','description')
++        model = GlobalHost
++        fields = ('id', 'project_id', 'name', 'host', 'status', 'description')
++
++
++class ReportSenderConfigSerializer(serializers.ModelSerializer):
++    """
++    邮件发送人配置序列化
++    """
++    project = serializers.CharField(source='project.name')
++
++    class Meta:
++        model = ReportSenderConfig
++        fields = ('id', 'project', 'sender_mailbox', 'user_name', 'mail_token', 'mail_smtp')
++
++
++class ReportSenderConfigDeserializer(serializers.ModelSerializer):
++    """
++    邮件发送人配置反序列化
++    """
++
++    class Meta:
++        model = ReportSenderConfig
++        fields = ('id', 'project_id', 'sender_mailbox', 'user_name', 'mail_token', 'mail_smtp')
++
++
++class ProjectMemberSerializer(serializers.ModelSerializer):
++    """
++    项目成员信息序列化
++    """
++    user_name=serializers.CharField(source='user.first_name')
++    user_phone=serializers.CharField(source='user.user.phone')
++    user_email=serializers.CharField(source='user.email')
++
++    class Meta:
++        model=ProjectMember
++        fields=('id','permission_type','user_name','user_phone','user_email')
