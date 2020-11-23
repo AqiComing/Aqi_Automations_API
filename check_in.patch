@@ -27,11 +27,11 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 +++ api_test/common/common.py	(date 1597978757532)
 @@ -1,6 +1,7 @@
  from datetime import datetime
- 
+
  from django.core.exceptions import ObjectDoesNotExist
 +from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
  from rest_framework.parsers import JSONParser
- 
+
  from api_test.common import code
 @@ -43,3 +44,38 @@
      except ObjectDoesNotExist:
@@ -137,17 +137,17 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
  from rest_framework.authtoken.models import Token
 -from api_test.models import Project, ProjectDynamic, GlobalHost
 +from api_test.models import Project, ProjectDynamic, GlobalHost, ReportSenderConfig, ProjectMember
- 
- 
+
+
  class TokenSerializer(serializers.ModelSerializer):
 @@ -48,7 +48,7 @@
          return obj.dynamic_project.all().count()
- 
+
      def get_memberCount(self, obj):
 -        return 0
 +        return obj.member_project.all().count()
- 
- 
+
+
  class ProjectDeserializer(serializers.ModelSerializer):
 @@ -83,6 +83,41 @@
      """
@@ -202,10 +202,10 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 +++ api_test/urls.py	(date 1597978830350)
 @@ -1,6 +1,6 @@
  from django.conf.urls import url
- 
+
 -from api_test.views import user, project, dynamic, global_host
 +from api_test.views import user, project, dynamic, global_host, member
- 
+
  urlpatterns=[
      url(r'user/login',user.ObtainAuthToken.as_view()),
 @@ -18,4 +18,7 @@
@@ -385,7 +385,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 --- frontend/dist/index.html	(revision beb4c982b0a9a9ff6f24400934a15514f4631d65)
 +++ frontend/dist/index.html	(date 1597979479628)
 @@ -1,1 +1,1 @@
--<!DOCTYPE html><html><head><meta charset=utf-8><title>自动化测试平台</title><script type=text/javascript src="http://webapi.amap.com/maps?v=1.4.6&key=340da0b5e65d566df0cdfc7c95df90e0"></script><link rel=stylesheet href=https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css><link rel=stylesheet href=https://unpkg.com/element-ui@2.4.6/lib/theme-chalk/index.css><link href=/static/css/app.71b5d1ef4c96b60d602a597a5683b4b0.css rel=stylesheet></head><body><div id=app></div><script src=https://cdn.jsdelivr.net/npm/vue/dist/vue.js></script><script src=https://g.alicdn.com/dingding/dinglogin/0.0.5/ddLogin.js></script><script src=https://cdn.jsdelivr.net/npm/vue></script><script src=https://unpkg.com/element-ui@2.4.6/lib/index.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.0.1/vue-router.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/vuex/3.0.1/vuex.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0-beta.49/polyfill.js></script><link href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/agate.min.css rel=stylesheet><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js></script><script type=text/javascript src=/static/js/manifest.a8431e19c69b22190398.js></script><script type=text/javascript src=/static/js/vendor.5d4e5ff7427b25b14a8c.js></script><script type=text/javascript src=/static/js/app.dc793ef5f018bd372917.js></script></body></html>
+-<!DOCTYPE html><html><head><meta charset=utf-8><title>Aqi_API_Testing</title><script type=text/javascript src="http://webapi.amap.com/maps?v=1.4.6&key=340da0b5e65d566df0cdfc7c95df90e0"></script><link rel=stylesheet href=https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css><link rel=stylesheet href=https://unpkg.com/element-ui@2.4.6/lib/theme-chalk/index.css><link href=/static/css/app.71b5d1ef4c96b60d602a597a5683b4b0.css rel=stylesheet></head><body><div id=app></div><script src=https://cdn.jsdelivr.net/npm/vue/dist/vue.js></script><script src=https://g.alicdn.com/dingding/dinglogin/0.0.5/ddLogin.js></script><script src=https://cdn.jsdelivr.net/npm/vue></script><script src=https://unpkg.com/element-ui@2.4.6/lib/index.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.0.1/vue-router.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/vuex/3.0.1/vuex.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0-beta.49/polyfill.js></script><link href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/agate.min.css rel=stylesheet><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js></script><script type=text/javascript src=/static/js/manifest.a8431e19c69b22190398.js></script><script type=text/javascript src=/static/js/vendor.5d4e5ff7427b25b14a8c.js></script><script type=text/javascript src=/static/js/app.dc793ef5f018bd372917.js></script></body></html>
 \ No newline at end of file
-+<!DOCTYPE html><html><head><meta charset=utf-8><title>自动化测试平台</title><script type=text/javascript src="http://webapi.amap.com/maps?v=1.4.6&key=340da0b5e65d566df0cdfc7c95df90e0"></script><link rel=stylesheet href=https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css><link rel=stylesheet href=https://unpkg.com/element-ui@2.4.6/lib/theme-chalk/index.css><link href=/static/css/app.71b5d1ef4c96b60d602a597a5683b4b0.css rel=stylesheet></head><body><div id=app></div><script src=https://cdn.jsdelivr.net/npm/vue/dist/vue.js></script><script src=https://g.alicdn.com/dingding/dinglogin/0.0.5/ddLogin.js></script><script src=https://cdn.jsdelivr.net/npm/vue></script><script src=https://unpkg.com/element-ui@2.4.6/lib/index.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.0.1/vue-router.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/vuex/3.0.1/vuex.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0-beta.49/polyfill.js></script><link href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/agate.min.css rel=stylesheet><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js></script><script type=text/javascript src=/static/js/manifest.8e9c4c7aaa1ca7cbd4a7.js></script><script type=text/javascript src=/static/js/vendor.5d4e5ff7427b25b14a8c.js></script><script type=text/javascript src=/static/js/app.dc793ef5f018bd372917.js></script></body></html>
++<!DOCTYPE html><html><head><meta charset=utf-8><title>Aqi_API_Testing</title><script type=text/javascript src="http://webapi.amap.com/maps?v=1.4.6&key=340da0b5e65d566df0cdfc7c95df90e0"></script><link rel=stylesheet href=https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css><link rel=stylesheet href=https://unpkg.com/element-ui@2.4.6/lib/theme-chalk/index.css><link href=/static/css/app.71b5d1ef4c96b60d602a597a5683b4b0.css rel=stylesheet></head><body><div id=app></div><script src=https://cdn.jsdelivr.net/npm/vue/dist/vue.js></script><script src=https://g.alicdn.com/dingding/dinglogin/0.0.5/ddLogin.js></script><script src=https://cdn.jsdelivr.net/npm/vue></script><script src=https://unpkg.com/element-ui@2.4.6/lib/index.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.0.1/vue-router.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/vuex/3.0.1/vuex.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0-beta.49/polyfill.js></script><link href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/agate.min.css rel=stylesheet><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js></script><script type=text/javascript src=/static/js/manifest.8e9c4c7aaa1ca7cbd4a7.js></script><script type=text/javascript src=/static/js/vendor.5d4e5ff7427b25b14a8c.js></script><script type=text/javascript src=/static/js/app.dc793ef5f018bd372917.js></script></body></html>
 \ No newline at end of file

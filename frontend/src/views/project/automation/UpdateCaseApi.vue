@@ -459,10 +459,10 @@
                         if (data.code === '999999') {
                             data = data.data;
                             self.form.name = data.name;
-                            self.form.request4 = data.requestType;
-                            self.form.Http4 = data.httpType;
-                            self.form.addr = data.apiAddress;
-                            if (data.formatRaw) {
+                            self.form.request4 = data.request_type;
+                            self.form.Http4 = data.http_type;
+                            self.form.addr = data.api_address;
+                            if (data.format_raw) {
                                 self.radioType = true
                             }
                             if (data.header.length) {
@@ -471,27 +471,27 @@
                                     self.form.head.push(item)
                                 })
                             }
-                            if (data.parameterList.length) {
+                            if (data.parameter_list.length) {
                                 self.form.parameter = [];
-                                data.parameterList.forEach((item) => {
+                                data.parameter_list.forEach((item) => {
                                     self.form.parameter.push(item)
                                 })
                             }
                             try {
-                                self.form.parameterRaw = data.parameterRaw.data.replace(/'/g, "\"").replace(/None/g, "null").replace(/True/g, "true").replace(/False/g, "false");
+                                self.form.parameterRaw = data.parameter_raw.data.replace(/'/g, "\"").replace(/None/g, "null").replace(/True/g, "true").replace(/False/g, "false");
                             } catch (e){
 
                             }
-                            self.form.parameterType = data.requestParameterType;
-                            self.form.check = data.examineType;
-                            self.form.checkHttp = data.httpCode;
+                            self.form.parameterType = data.request_parameter_type;
+                            self.form.check = data.examine_type;
+                            self.form.checkHttp = data.http_code;
                             try {
                                 self.form.RegularParam = data.RegularParam
                             } catch (e) {
 
                             }
                             self.form.checkData = data.responseData;
-                            self.radio = data.requestParameterType;
+                            self.radio = data.request_parameter_type;
                             self.checkRequest()
                         }
                         else {

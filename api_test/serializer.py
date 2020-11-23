@@ -255,6 +255,15 @@ class AutomationHeadSerializer(serializers.ModelSerializer):
         fields=('id','automation_case_api_id','name','value','interrelate')
 
 
+class AutomationHeadDeserializer(serializers.ModelSerializer):
+    """
+    测试用例接口请求头信息序列化
+    """
+    class Meta:
+        model=AutomationHead
+        fields=('id','automation_case_api_id','name','value','interrelate')
+
+
 class AutomationParameterSerializer(serializers.ModelSerializer):
     """
     测试用例接口参数序列化
@@ -303,4 +312,4 @@ class AutomationCaseApiDesSerializer(serializers.ModelSerializer):
     class Meta:
         model=AutomationCaseApi
         fields=('id','automation_test_case_id','name','http_type','request_type','api_address',
-                'format_raw','examine_type','http_code','response_code')
+                'request_parameter_type','format_raw','examine_type','http_code','response_code')

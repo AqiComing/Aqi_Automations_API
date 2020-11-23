@@ -58,7 +58,7 @@
     export default {
         data() {
             return {
-                sysName:'自动化测试平台',
+                sysName:'Aqi_API_Testing',
                 collapsed:false,
                 sysUserName: '',
                 // sysUserAvatar: '',

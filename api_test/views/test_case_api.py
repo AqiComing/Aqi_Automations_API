@@ -14,7 +14,7 @@ from api_test.models import AutomationTestCase, AutomationCaseApi, Project, APII
     AutomationParameterRaw, AutomationHead, AutomationResponseJson
 from api_test.serializer import AutomationCaseApiSerializer, APIInfoSerializer, AutomationCaseApiDesSerializer, \
     AutomationCaseApiListSerializer, AutomationHeadSerializer, AutomationParameterSerializer, \
-    AutomationParameterRawSerializer
+    AutomationParameterRawSerializer, AutomationHeadDeserializer
 
 
 def get_test_case(data):
@@ -38,11 +38,11 @@ def all_parameter_check(data):
     :return:
     """
     try:
-        if not data['project_id'] or not data['automation_test_case_id'] or not data['name'] or not data['http_type'] \
+        if not data['project_id'] or not data['case_id'] or not data['name'] or not data['http_type'] \
             or not data['request_type'] or not data['api_address'] or not data['request_parameter_type'] \
             or not data['examine_type']:
             return JsonResponse(code=code.CODE_PARAMETER_ERROR,msg='必需参数值未空')
-        if not isinstance(data['project_id'],int) or not isinstance(data['automation_test_case_id'],int):
+        if not isinstance(data['project_id'],int) or not isinstance(data['case_id'],int):
             return JsonResponse(code=code.CODE_PARAMETER_ERROR)
         if data['http_type'] not in ('HTTP', "HTTPS") or data['request_type'] not in (
             'POST', 'GET', 'PUT', 'DELETE') or data['request_parameter_type'] not in ['form-data', 'raw', 'Restful']:
@@ -205,7 +205,6 @@ class AddNewAPI(APIView):
         project=get_availability_project(data,request.user)
         test_case=get_test_case(data)
         result = all_parameter_check(data) if isinstance(project,Project) else project
-        all_parameter_check(data)
         if result:
             return result
         if not isinstance(test_case,AutomationTestCase):
@@ -214,33 +213,33 @@ class AddNewAPI(APIView):
         if len(api):
             return JsonResponse(code=code.CODE_EXIST_SAME_NAME)
         with transaction.atomic():
-            serializer=AutomationCaseApiSerializer(data=data)
+            serializer=AutomationCaseApiDesSerializer(data=data)
             if serializer.is_valid():
-                serializer.save()
+                serializer.save(automation_test_case=test_case)
                 new_api_id=serializer.data.get("id")
-                new_api=AutomationCaseApi.objects.get(new_api_id)
-                if len(data.get('headDict')):
-                    for head in data['headDict']:
+                new_api=AutomationCaseApi.objects.get(id=new_api_id)
+                if len(data.get('head_dict')):
+                    for head in data['head_dict']:
                         if head['name']:
-                            head['automation_case_api_id']=new_api_id
-                            head_serializer=AutomationHeadSerializer(data=head)
+                            #head['automation_case_api_id']=new_api_id
+                            head_serializer=AutomationHeadDeserializer(data=head)
                             if head_serializer.is_valid():
-                                head_serializer.save()
+                                head_serializer.save(automation_case_api=new_api)
                 if data["request_parameter_type"]=='form-data':
-                    if len(data.get("request_list")):
-                        for parameter in data["request_list"]:
-                            parameter["automation_case_api_id"]=new_api_id
+                    if len(data.get("parameter")):
+                        for parameter in data["parameter"]:
+                            #parameter["automation_case_api_id"]=new_api_id
                             parameter_serializer=AutomationParameterSerializer(data=parameter)
                             if parameter_serializer.is_valid():
-                                parameter_serializer.save()
+                                parameter_serializer.save(automation_case_api=new_api)
                 else:
                     # if len(data.get["request_list"]):
                     #     AutomationParameterRaw(automation_case_api=new_api,data=data["request_list"]).save()
-                    if len(data.get('request_list')):
-                        data["automation_case_api_id"]=new_api_id
+                    if len(data.get('parameter')):
+                        #data["automation_case_api_id"]=new_api_id
                         parameter_serializer=AutomationParameterRawSerializer(data=data)
                         if parameter_serializer.is_valid():
-                            parameter_serializer.save()
+                            parameter_serializer.save(automation_case_api=new_api)
                 if data.get("examine_type")=="json":
                     try:
                         response=eval(data['response_data'].replace('true',"True").replace("false","False").replace("null","None"))
@@ -255,8 +254,8 @@ class AddNewAPI(APIView):
                         AutomationResponseJson(automation_case_api=new_api,name=data["RegularParam"],
                                                tier='<response[Regular][%s]["%s"]>'%(new_api_id,data['response_data']),
                                                type="Regular").save()
-                    return JsonResponse(data={"api_id":new_api_id},code=code.CODE_SUCCESS)
-                return JsonResponse(code=code.CODE_Failed)
+                return JsonResponse(data={"api_id":new_api_id},code=code.CODE_SUCCESS)
+            return JsonResponse(code=code.CODE_Failed)
 
 
 
