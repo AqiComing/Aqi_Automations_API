@@ -6,7 +6,7 @@ from rest_framework.parsers import JSONParser
 
 from api_test.common import code
 from api_test.common.api_response import JsonResponse
-from api_test.models import Project, AutomationResponseJson
+from api_test.models import Project, AutomationResponseJson, AutomationCaseApi, AutomationTestResult
 from api_test.serializer import ProjectDynamicDeserializer, ProjectSerializer
 
 
@@ -100,3 +100,57 @@ def create_json(api_id,api,data):
             m=(api+"[\"%s\"]"%i)
             AutomationResponseJson(automation_case_api=api_id,name=i,tier=m,type='json').save()
             create_json(api,m,data[i])
+
+
+def check_json(src_data,dst_data):
+    """
+    校验json
+    :param src_data: 校验内容
+    :param dst_data: 返回数据
+    :return:
+    """
+    global result
+    try:
+        if isinstance(src_data,dict):
+            for key in src_data:
+                if key not in dst_data:
+                    return 'fail'
+                else:
+                    this_key=key
+                    if isinstance(src_data[this_key],dict) and isinstance(dst_data[this_key],dict):
+                        check_json(src_data[this_key],dst_data[this_key])
+                    elif isinstance(type(src_data[this_key]),type(dst_data[this_key])):
+                        return 'fail'
+                    else:
+                        pass
+            return result
+        return 'fail'
+    except Exception as e:
+        return 'fail'
+
+
+def record_result(_id,url,request_type,header,parameter,host,status_code,examine_type,examine_data,_result,code,response_data):
+    """
+    记录手动测试结果
+    :param _id:
+    :param url:
+    :param request_type:
+    :param header:
+    :param parameter:
+    :param host:
+    :param status_code:
+    :param examine_type:
+    :param _result:
+    :param code:
+    :param response_data:
+    :return:
+    """
+    result=AutomationTestResult.objects.filter(automation_case_api=_id)
+    if result:
+        result.update(url=url,request_type=request_type,header=header,parameter=parameter,host=host,status_code=status_code,
+                      result=_result,examine_type=examine_type,data=examine_data,http_status=code,response_data=response_data)
+    else:
+        result=AutomationTestResult(automation_case_api=AutomationCaseApi.objects.get(id=_id),url=url,request_type=request_type,
+                                    header=header,parameter=parameter,host=host,status_code=status_code,result=_result,
+                                    examine_type=examine_type,data=examine_data,http_status=code,response_data=response_data)
+        result.save()

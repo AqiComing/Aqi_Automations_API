@@ -2,6 +2,7 @@ import json
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.db.models import Q
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
@@ -14,7 +15,7 @@ from api_test.models import AutomationTestCase, AutomationCaseApi, Project, APII
     AutomationParameterRaw, AutomationHead, AutomationResponseJson
 from api_test.serializer import AutomationCaseApiSerializer, APIInfoSerializer, AutomationCaseApiDesSerializer, \
     AutomationCaseApiListSerializer, AutomationHeadSerializer, AutomationParameterSerializer, \
-    AutomationParameterRawSerializer, AutomationHeadDeserializer
+    AutomationParameterRawSerializer, AutomationHeadDeserializer, CorrelationDataSerializer
 
 
 def get_test_case(data):
@@ -23,13 +24,14 @@ def get_test_case(data):
     :param data:
     :return:
     """
-    if not data['case_id'] or not isinstance(data['case_id'],int):
+    if not data['automation_test_case_id'] or not isinstance(data['automation_test_case_id'],int):
         return JsonResponse(code=code.CODE_PARAMETER_ERROR)
     try:
-        test_case=AutomationTestCase.objects.get(id=data['case_id'], project=data['project_id'])
+        test_case=AutomationTestCase.objects.get(id=data['automation_test_case_id'], project=data['project_id'])
     except ObjectDoesNotExist:
         return JsonResponse(code="999987", msg="测试用例不存在！")
     return test_case
+
 
 def all_parameter_check(data):
     """
@@ -38,11 +40,11 @@ def all_parameter_check(data):
     :return:
     """
     try:
-        if not data['project_id'] or not data['case_id'] or not data['name'] or not data['http_type'] \
+        if not data['project_id'] or not data['automation_test_case_id'] or not data['name'] or not data['http_type'] \
             or not data['request_type'] or not data['api_address'] or not data['request_parameter_type'] \
             or not data['examine_type']:
             return JsonResponse(code=code.CODE_PARAMETER_ERROR,msg='必需参数值未空')
-        if not isinstance(data['project_id'],int) or not isinstance(data['case_id'],int):
+        if not isinstance(data['project_id'],int) or not isinstance(data['automation_test_case_id'],int):
             return JsonResponse(code=code.CODE_PARAMETER_ERROR)
         if data['http_type'] not in ('HTTP', "HTTPS") or data['request_type'] not in (
             'POST', 'GET', 'PUT', 'DELETE') or data['request_parameter_type'] not in ['form-data', 'raw', 'Restful']:
@@ -225,7 +227,7 @@ class AddNewAPI(APIView):
                             head_serializer=AutomationHeadDeserializer(data=head)
                             if head_serializer.is_valid():
                                 head_serializer.save(automation_case_api=new_api)
-                if data["request_parameter_type"]=='form-data':
+                if data.get('request_parameter_type')=='form-data':
                     if len(data.get("parameter")):
                         for parameter in data["parameter"]:
                             #parameter["automation_case_api_id"]=new_api_id
@@ -258,5 +260,122 @@ class AddNewAPI(APIView):
             return JsonResponse(code=code.CODE_Failed)
 
 
+class UpdateAPI(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = ()
+
+    def post(self,request):
+        """
+        更新test_case接口
+        :param request:
+        :return:
+        """
+        data=JSONParser().parse(request)
+        project=get_availability_project(data,request.user)
+        test_case=get_test_case(data)
+        result=all_parameter_check(data) if isinstance(project,Project) else project
+        if result:
+            return result
+        if not isinstance(test_case,AutomationTestCase):
+            return test_case
+        try:
+            case_api=AutomationCaseApi.objects.get(id=data['id'],automation_test_case=test_case.id)
+        except ObjectDoesNotExist:
+            return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST,msg="用例接口不存在")
+        same_name_api=AutomationCaseApi.objects.filter(name=data['name'],automation_test_case=test_case.id).exclude(id=case_api.id)
+        if len(same_name_api):
+            return JsonResponse(code=code.CODE_EXIST_SAME_NAME,msg='存在同名API')
+        with transaction.atomic():
+            serializer=AutomationCaseApiDesSerializer(data=data)
+            if serializer.is_valid():
+                serializer.update(instance=case_api,validated_data=data)
+
+                retain_headers=Q()
+                if len(data.get("head_dict")):
+                    for header in data['head_dict']:
+                        if header.get("automation_case_api_id") and header.get("id"):
+                            retain_headers=retain_headers| Q(id=header['id'])
+                            if header['name']:
+                                header_serializer=AutomationHeadDeserializer(data=header)
+                                if header_serializer.is_valid():
+                                    header_serializer.update(instance=AutomationHead.objects.get(id=header['id']),validated_data=header)
+                        else:
+                            if header.get('name'):
+                                header_serializer = AutomationHeadDeserializer(data=header)
+                                if header_serializer.is_valid():
+                                    header_serializer.save(automation_case_api=case_api)
+                                    retain_headers=retain_headers|Q(id=header_serializer.data.get("id"))
+                AutomationHead.objects.exclude(retain_headers).filter(automation_case_api=case_api).delete()
+
+                retain_params=Q()
+                if len(data.get('request_list')):
+                    if data.get('request_parameter_type')=='form-data':
+                        AutomationParameterRaw.objects.filter(automation_case_api=case_api.id).delete()
+                        for param in data['request_list']:
+                            if param.get('id') and param.get('automation_case_api_id'):
+                                retain_params=retain_params|Q(id=param['id'])
+                                param_serializer=AutomationParameterSerializer(data=param)
+                                if param_serializer.is_valid():
+                                    param_serializer.update(instance=AutomationParameter.objects.get(id=param['id']),validated_data=param)
+                            else:
+                                if param.get('name'):
+                                    param_serializer = AutomationParameterSerializer(data=param)
+                                    if param_serializer.is_valid():
+                                        param_serializer.save(automation_case_api=case_api)
+                                        retain_params = retain_params | Q(id=param_serializer.data.get('id'))
+
+                    else:
+                        objects=AutomationParameterRaw.objects.filter(automation_case_api=case_api)
+                        if len(objects):
+                            objects[0].delete()
+                        param_raw=AutomationParameterRaw(automation_case_api=case_api,data=data["request_list"])
+                        param_raw.save()
+                AutomationParameter.objects.exclude(retain_params).filter(automation_case_api=case_api).delete()
+                AutomationResponseJson.objects.filter(automation_case_api=case_api).delete()
+
+                if data.get("examine_type")=="json":
+                    try:
+                        response=eval(data['response_data'].replace('true',"True").replace("false","False").replace("null","None"))
+                        api="<response[JSON][%s]>"% case_api.id
+                        create_json(case_api,api,response)
+                    except KeyError:
+                        return JsonResponse(code=code.CODE_Failed)
+                    except AttributeError:
+                        return JsonResponse(code="999998",msg="校验内容不能为空")
+                elif data.get("examine_type")=="Regular_check":
+                    if data.get("RegularParam"):
+                        AutomationResponseJson(automation_case_api=case_api,name=data["RegularParam"],
+                                               tier='<response[Regular][%s]["%s"]>'%(case_api.id,data['response_data']),
+                                               type="Regular").save()
+                record_dynamic(project=project,_type="修改",operation_object="用例接口",user=request.user.pk,
+                               data="用例'%s'修改接口\"%s\""% (test_case.case_name,data["name"]))
+                return JsonResponse(code=code.CODE_SUCCESS)
+            return JsonResponse(code=code.CODE_Failed)
+
+
+class GetCorrelationResponse(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = ()
+
+    def get(self,request):
+        """
+        获取接口关联数据
+        :param request:
+        :return:
+        """
+        result = project_status_check(request)
+        if result:
+            return result
+        project_id, case_id, api_id = request.GET.get('project_id'), request.GET.get('case_id'), request.GET.get(
+            'api_id')
+        try:
+            AutomationTestCase.objects.get(id=case_id, project=project_id)
+        except ObjectDoesNotExist:
+            return JsonResponse(code="999987", msg="测试用例不存在！")
+        if api_id:
+            data=CorrelationDataSerializer(AutomationCaseApi.objects.filter(automation_test_case=case_id,id__lt=api_id),many=True).data
+        else:
+            data=CorrelationDataSerializer(AutomationCaseApi.objects.filter(automation_test_case=case_id),many=True).data
+        return JsonResponse(code=code.CODE_SUCCESS,data=data)
 
 

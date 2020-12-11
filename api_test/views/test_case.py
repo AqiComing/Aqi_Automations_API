@@ -1,3 +1,4 @@
+import logging
 from unittest import TestCase
 
 from django.contrib.auth.models import User
@@ -11,8 +12,10 @@ from rest_framework.views import APIView
 from api_test.common import code
 from api_test.common.api_response import JsonResponse
 from api_test.common.common import get_availability_project, record_dynamic, objects_paginator
+from api_test.common.config_http import test_api
 from api_test.common.parameter_check import project_status_check, parameter_ids_check
-from api_test.models import Project, AutomationTestCase, TestCaseGroup
+from api_test.models import Project, AutomationTestCase, TestCaseGroup, GlobalHost, AutomationCaseApi, \
+    AutomationTestResult
 from api_test.serializer import TestCaseDeserializer, TestCaseSerializer
 
 
@@ -189,5 +192,58 @@ class UpdateCaseGroup(APIView):
             record_dynamic(project=project, _type='修改', operation_object='测试用例', user=request.user.pk,
                            data='修改测试用例分组 %s' % case_name)
             return JsonResponse(code=code.CODE_SUCCESS)
+
+
+class Test(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = ()
+
+    def parameter_check(self,data):
+        """
+        校验参数
+        :param data:
+        :return:
+        """
+        try:
+            if not data['project_id'] or not data['case_id'] or not data['id'] or not data['host_id']:
+                return JsonResponse(code=code.CODE_PARAMETER_ERROR)
+        except KeyError:
+            return JsonResponse(code=code.CODE_PARAMETER_ERROR)
+
+    def post(self,request):
+        """
+        执行
+        :param request:
+        :return:
+        """
+        data=JSONParser().parse(request)
+        project=get_availability_project(data,request.user)
+        result=self.parameter_check(data) if isinstance(project,Project) else project
+        if result:
+            return result
+        try:
+            case=AutomationTestCase.objects.get(id=data['case_id'],project=project.id)
+        except ObjectDoesNotExist:
+            return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST,msg='测试用例不存在')
+        try:
+            host=GlobalHost.objects.get(id=data['host_id'],project=project.pk)
+        except ObjectDoesNotExist:
+            return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST,msg="host不存在")
+        try:
+            case_api=AutomationCaseApi.objects.get(id=data['id'],automation_test_case=case.id)
+        except ObjectDoesNotExist:
+            return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST,msg="接口不存在")
+        AutomationTestResult.objects.filter(automation_case_api=case_api.id).delete()
+        try:
+            result=test_api(host_id=host.id,case_id=case.id,_id=case_api.id,project_id=project.id)
+        except Exception as e:
+            logging.exception(e)
+            return JsonResponse(code=code.CODE_Failed)
+        record_dynamic(project=project, _type='测试', operation_object='用例接口', user=request.user.pk,
+                       data="测试用例 %s 接口\"%s\""%(case.case_name,case_api.name))
+        return JsonResponse(data={
+            "result":result
+        },code=code.CODE_SUCCESS)
+
 
 

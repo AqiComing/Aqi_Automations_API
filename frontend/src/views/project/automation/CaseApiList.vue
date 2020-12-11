@@ -301,7 +301,7 @@
                         async: true,
                         data: JSON.stringify({
                             project_id: Number(this.$route.params.project_id),
-                            case_id: Number(this.$route.params.case_id),
+                            automation_test_case_id: Number(this.$route.params.case_id),
                             ids: [row.id] }),
                         headers: {
                             "Content-Type": "application/json",
@@ -448,7 +448,7 @@
                     //NProgress.start();
                     let param = JSON.stringify({
                             project_id: Number(this.$route.params.project_id),
-                            case_id: Number(this.$route.params.case_id),
+                            automation_test_case_id: Number(this.$route.params.case_id),
                             api_ids: ids,
                         });
                     $.ajax({

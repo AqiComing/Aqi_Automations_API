@@ -88,7 +88,7 @@ DATABASES = {
         'NAME': 'aqi_api',
         'USER': 'zhaoqi',
         'PASSWORD': 'zhaoqi',
-        'HOST': '192.168.11.200',
+        'HOST': '192.168.12.124',
         'PORT': '3306',
     }
 }

@@ -366,20 +366,20 @@
                             }
                             let param = JSON.stringify({
                                 project_id: Number(self.$route.params.project_id),
-                                automationTestCase_id: Number(self.$route.params.case_id),
+                                automation_test_case_id: Number(self.$route.params.case_id),
                                 id: Number(self.$route.params.api_id),
                                 name: self.form.name,
-                                httpType: self.form.Http4,
-                                requestType: self.form.request4,
-                                apiAddress: self.form.addr,
-                                headDict: self.form.head,
-                                requestParameterType: _type,
+                                http_type: self.form.Http4,
+                                request_type: self.form.request4,
+                                api_address: self.form.addr,
+                                head_dict: self.form.head,
+                                request_parameter_type: _type,
                                 formatRaw: formatRaw,
-                                requestList: _parameter,
-                                examineType: self.form.check,
+                                request_list: _parameter,
+                                examine_type: self.form.check,
                                 RegularParam: self.form.RegularParam,
-                                httpCode: self.form.checkHttp,
-                                responseData: self.form.checkData
+                                http_code: self.form.checkHttp,
+                                response_data: self.form.checkData
                             });
                             console.log(param)
                             $.ajax({

@@ -363,7 +363,7 @@
                             }
                             let param = JSON.stringify({
                                 project_id: Number(self.$route.params.project_id),
-                                case_id: Number(self.$route.params.case_id),
+                                automation_test_case_id: Number(self.$route.params.case_id),
                                 name: self.form.name,
                                 http_type: self.form.Http4,
                                 request_type: self.form.request4,

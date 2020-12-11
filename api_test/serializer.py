@@ -279,7 +279,7 @@ class AutomationParameterRawSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model=AutomationParameterRaw
-        fields=('id','automation_case_api_id','data')
+        fields=('id','automation_case_api','data')
 
 
 class AutomationResponseJsonSerializer(serializers.ModelSerializer):
@@ -291,18 +291,29 @@ class AutomationResponseJsonSerializer(serializers.ModelSerializer):
         fields=('id','automation_case_api','name','tier')
 
 
+class CorrelationDataSerializer(serializers.ModelSerializer):
+    """
+    关联数据序列化
+    """
+    response=AutomationResponseJsonSerializer(many=True,read_only=True)
+
+    class Meta:
+        model=AutomationCaseApi
+        fields=('id','name','response')
+
+
 class AutomationCaseApiSerializer(serializers.ModelSerializer):
     """
     自动化用例接口详细信息序列化
     """
     header=AutomationHeadSerializer(many=True,read_only=True)
     parameter_list=AutomationParameterSerializer(many=True,read_only=True)
-    parameter_raw=AutomationParameterRawSerializer(many=True,read_only=True)
+    parameter_raw=AutomationParameterRawSerializer(many=False, read_only=True)
 
     class Meta:
         model=AutomationCaseApi
         fields=('id','name','http_type','request_type','api_address','header','request_parameter_type','format_raw',
-                'parameter_list','parameter_raw','examine_type','http_code','response_code')
+                'parameter_list', 'parameter_raw', 'examine_type', 'http_code', 'response_data')
 
 
 class AutomationCaseApiDesSerializer(serializers.ModelSerializer):
@@ -312,4 +323,4 @@ class AutomationCaseApiDesSerializer(serializers.ModelSerializer):
     class Meta:
         model=AutomationCaseApi
         fields=('id','automation_test_case_id','name','http_type','request_type','api_address',
-                'request_parameter_type','format_raw','examine_type','http_code','response_code')
+                'request_parameter_type','format_raw','examine_type','http_code','response_data')

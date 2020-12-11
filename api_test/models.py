@@ -38,7 +38,13 @@ EXAMINE_TYPE_CHOICE=(
     ('entirely_check','完全校验'),
     ('regular_check','正则校验')
 )
+
 PARAMETER_TYPE_CHOICE=(('Int','Int'),('String','String'))
+
+RESULT_CHOICE=(
+    ('PASS','成功'),
+    ('FAIL','失败')
+)
 
 """
 @receiver(post_save,sender=**)
@@ -352,7 +358,7 @@ class AutomationCaseApi(models.Model):
     format_raw=models.BooleanField(default=False,verbose_name='是否转换位源数据')
     examine_type=models.CharField(default='no_check',max_length=50,verbose_name='校验方式',choices=EXAMINE_TYPE_CHOICE)
     http_code=models.CharField(max_length=50,blank=True,null=True,verbose_name='HTTP状态',choices=HTTP_CODE_CHOICE)
-    response_code=models.TextField(blank=True,null=True,verbose_name='返回内容')
+    response_data=models.TextField(blank=True,null=True,verbose_name='返回内容')
 
     def __unicode__(self):
         return self.name
@@ -408,7 +414,7 @@ class AutomationParameterRaw(models.Model):
     请求的源数据参数
     """
     id=models.AutoField(primary_key=True)
-    automation_case_api = models.ForeignKey(AutomationCaseApi, related_name='parameter_raw', on_delete=models.CASCADE,
+    automation_case_api = models.OneToOneField(AutomationCaseApi, related_name='parameter_raw', on_delete=models.CASCADE,
                                             verbose_name='接口')
     data=models.TextField(verbose_name="请求参数源数据",blank=True,null=True)
 
@@ -441,6 +447,24 @@ class AutomationTestResult(models.Model):
     手动执行结果
     """
     id=models.AutoField(primary_key=True)
-    automation_case_api = models.ForeignKey(AutomationCaseApi, related_name='test_result', on_delete=models.CASCADE,
-                                            verbose_name='接口')
-    # url=models.CharField(max_length=)
+    automation_case_api = models.ForeignKey(AutomationCaseApi, on_delete=models.CASCADE,verbose_name='接口'
+                                            ,related_name='test_result')
+    url=models.CharField(max_length=1024,verbose_name="请求地址")
+    request_type=models.CharField(max_length=50,verbose_name="请求方式",choices=REQUEST_TYPE_CHOICE)
+    host=models.CharField(max_length=1024,verbose_name="host",null=True,blank=True)
+    header=models.CharField(max_length=1024,verbose_name="请求头",null=True,blank=True)
+    parameter=models.TextField(blank=True,null=True,verbose_name="请求参数")
+    status_code=models.CharField(max_length=50,verbose_name="期望HTTP状态",blank=True,null=True,choices=HTTP_CODE_CHOICE)
+    examine_type=models.CharField(max_length=1024,verbose_name="匹配规则")
+    data=models.TextField(blank=True,null=True,verbose_name="规则内容")
+    result=models.CharField(max_length=50,verbose_name="测试结果",choices=RESULT_CHOICE)
+    http_status=models.CharField(max_length=50,verbose_name='http状态',blank=True,null=True,choices=HTTP_CODE_CHOICE)
+    response_data=models.TextField(blank=True,null=True,verbose_name='实际返回内容')
+    test_time=models.DateTimeField(auto_now_add=True,verbose_name='测试时间')
+
+    def __unicode__(self):
+        return self.http_status
+
+    class Meta:
+        verbose_name="手动测试结果"
+        verbose_name_plural="手动测试结果管理"
