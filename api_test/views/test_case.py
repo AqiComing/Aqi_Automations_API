@@ -16,7 +16,7 @@ from api_test.common.config_http import test_api
 from api_test.common.parameter_check import project_status_check, parameter_ids_check
 from api_test.models import Project, AutomationTestCase, TestCaseGroup, GlobalHost, AutomationCaseApi, \
     AutomationTestResult
-from api_test.serializer import TestCaseDeserializer, TestCaseSerializer
+from api_test.serializer import TestCaseDeserializer, TestCaseSerializer, AutomationTestResultSerializer
 
 
 def all_parameter_check(data):
@@ -244,6 +244,38 @@ class Test(APIView):
         return JsonResponse(data={
             "result":result
         },code=code.CODE_SUCCESS)
+
+
+class LookResult(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = ()
+
+    def get(self,request):
+        """
+        获取测试结果
+        :param request:
+        :return:
+        """
+        project_id,case_id,api_id=request.GET.get('project_id'),request.GET.get('case_id'),request.GET.get('api_id')
+        result=project_status_check(request)
+        if result:
+            return result
+        try:
+            AutomationTestCase.objects.get(id=case_id,project_id=project_id)
+        except ObjectDoesNotExist:
+            return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST,msg="用例不存在")
+        try:
+            AutomationCaseApi.objects.get(id=api_id,automation_test_case=case_id)
+        except ObjectDoesNotExist:
+            return JsonResponse(code=code.CODE_OBJECT_NOT_EXIST,msg="接口不存在")
+        try:
+            data=AutomationTestResult.objects.get(automation_case_api=api_id)
+            serializer=AutomationTestResultSerializer(data)
+            return JsonResponse(data=serializer.data,code=code.CODE_SUCCESS)
+        except ObjectDoesNotExist:
+            return JsonResponse(code=code.CODE_Failed)
+
+
 
 
 

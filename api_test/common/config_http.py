@@ -49,10 +49,10 @@ def test_api(host_id,case_id,project_id,_id):
             try:
                 if param['fields']['interrelate']:
                     # 匹配<response>[]中间的数据
-                    interrelate_type = re.findall('(?<=<response>\[).*?(?=\])', value)
+                    interrelate_type = re.findall('(?<=<response\[).*?(?=\])', value)
                     if interrelate_type[0] == "JSON":
-                        api_id = re.findall('(?<=<response>\[JSON\[).*?(?=\])', value)
-                        a = re.findall('(?<=\[").*?(?="])')
+                        api_id = re.findall('(?<=<response\[JSON\]\[).*?(?=\])', value)
+                        a = re.findall('(?<=\[").*?(?="])',value)
                         try:
                             param_data = eval(json.loads(serializers.serialize('json',
                                                                                AutomationTestResult.objects.filter(
@@ -94,7 +94,7 @@ def test_api(host_id,case_id,project_id,_id):
                               examine_data=response_parameter_list,
                               _result='Error', code="", response_data="")
                 return "fail"
-            if data["formatRaw"]:
+            if data["format_raw"]:
                 request_parameter_type="raw"
     else:
         parameter=AutomationParameterRawSerializer(AutomationParameterRaw.objects.filter(automation_case_api=_id))
@@ -227,7 +227,7 @@ def post(header,address,request_parameter_type,data):
     """
     if request_parameter_type=="raw":
         data=json.dumps(data)
-    response=requests.post(url=address,data=data,header=header,timeout=8)
+    response=requests.post(url=address,data=data,headers=header,timeout=8)
     try:
         return response.status_code,response.json(),response.headers
     except json.decoder.JSONDecodeError:

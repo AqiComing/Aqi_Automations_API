@@ -374,7 +374,7 @@
                                 api_address: self.form.addr,
                                 head_dict: self.form.head,
                                 request_parameter_type: _type,
-                                formatRaw: formatRaw,
+                                format_raw: formatRaw,
                                 request_list: _parameter,
                                 examine_type: self.form.check,
                                 RegularParam: self.form.RegularParam,
@@ -490,7 +490,7 @@
                             } catch (e) {
 
                             }
-                            self.form.checkData = data.responseData;
+                            self.form.checkData = data.response_data;
                             self.radio = data.request_parameter_type;
                             self.checkRequest()
                         }

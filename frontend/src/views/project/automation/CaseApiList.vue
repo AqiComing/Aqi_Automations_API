@@ -406,16 +406,16 @@
                     success: (data) => {
                         if (data.code === '999999') {
                             self.result["url"] = data.data.url;
-                            self.result["requestType"] = data.data.requestType;
+                            self.result["requestType"] = data.data.request_type;
                             self.result["header"] = eval("("+data.data.header+")");
                             self.result["parameter"] = data.data.parameter;
-                            self.result["statusCode"] = data.data.statusCode;
-                            self.result["examineType"] = data.data.examineType;
+                            self.result["statusCode"] = data.data.status_code;
+                            self.result["examineType"] = data.data.examine_type;
                             self.result["data"] = data.data.data;
                             self.result["result"] = data.data.result;
-                            self.result["httpStatus"] = data.data.httpStatus;
-                            self.result["responseData"] = JSON.parse(data.data.responseData.replace(/'/g, "\"").replace(/None/g, "null").replace(/True/g, "true").replace(/False/g, "false"));
-                            self.result["testTime"] = data.data.testTime;
+                            self.result["httpStatus"] = data.data.http_status;
+                            self.result["responseData"] = JSON.parse(data.data.response_data.replace(/'/g, "\"").replace(/None/g, "null").replace(/True/g, "true").replace(/False/g, "false"));
+                            self.result["testTime"] = data.data.test_time;
                             self.TestResult = true;
                         }
                         else {

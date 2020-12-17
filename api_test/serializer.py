@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from api_test.models import Project, ProjectDynamic, GlobalHost, ReportSenderConfig, ProjectMember, APIGroup, APIHead, \
     APIParameter, APIParameterRaw, APIResponse, APIInfo, TestCaseGroup, AutomationTestCase, AutomationCaseApi, \
-    AutomationHead, AutomationParameter, AutomationParameterRaw, AutomationResponseJson
+    AutomationHead, AutomationParameter, AutomationParameterRaw, AutomationResponseJson, AutomationTestResult
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -324,3 +324,16 @@ class AutomationCaseApiDesSerializer(serializers.ModelSerializer):
         model=AutomationCaseApi
         fields=('id','automation_test_case_id','name','http_type','request_type','api_address',
                 'request_parameter_type','format_raw','examine_type','http_code','response_data')
+
+
+class AutomationTestResultSerializer(serializers.ModelSerializer):
+    """
+    手动测试结果序列化
+    """
+    test_time=serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+
+    class Meta:
+        model=AutomationTestResult
+        fields=('id','url','request_type','header','parameter','status_code','examine_type','data','result',
+                'http_status','response_data','test_time')
+

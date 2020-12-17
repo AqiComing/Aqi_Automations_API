@@ -49,7 +49,6 @@ urlpatterns=[
     url(r'automation/update_api',test_case_api.UpdateAPI.as_view()),
     url(r'automation/get_correlation_response',test_case_api.GetCorrelationResponse.as_view()),
     url(r'automation/start_test',test_case.Test.as_view()),
-
-
+    url(r'automation/look_result',test_case.LookResult.as_view()),
 
 ]

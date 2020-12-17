@@ -99,7 +99,9 @@ def create_json(api_id,api,data):
         for i in data:
             m=(api+"[\"%s\"]"%i)
             AutomationResponseJson(automation_case_api=api_id,name=i,tier=m,type='json').save()
-            create_json(api,m,data[i])
+            create_json(api_id,m,data[i])
+
+result='success'
 
 
 def check_json(src_data,dst_data):
@@ -119,10 +121,11 @@ def check_json(src_data,dst_data):
                     this_key=key
                     if isinstance(src_data[this_key],dict) and isinstance(dst_data[this_key],dict):
                         check_json(src_data[this_key],dst_data[this_key])
-                    elif isinstance(type(src_data[this_key]),type(dst_data[this_key])):
-                        return 'fail'
-                    else:
+                    #elif isinstance(type(src_data[this_key]),type(dst_data[this_key])):
+                    elif src_data[this_key]==dst_data[this_key]:
                         pass
+                    else:
+                        return 'fail'
             return result
         return 'fail'
     except Exception as e:

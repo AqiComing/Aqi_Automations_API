@@ -14,7 +14,7 @@ from api_test.common.parameter_check import project_status_check
 from api_test.models import AutomationTestCase, AutomationCaseApi, Project, APIInfo, AutomationParameter, \
     AutomationParameterRaw, AutomationHead, AutomationResponseJson
 from api_test.serializer import AutomationCaseApiSerializer, APIInfoSerializer, AutomationCaseApiDesSerializer, \
-    AutomationCaseApiListSerializer, AutomationHeadSerializer, AutomationParameterSerializer, \
+    AutomationCaseApiListSerializer, AutomationParameterSerializer, \
     AutomationParameterRawSerializer, AutomationHeadDeserializer, CorrelationDataSerializer
 
 

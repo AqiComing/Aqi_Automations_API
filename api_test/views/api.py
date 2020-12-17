@@ -206,7 +206,7 @@ class UpdateAPI(APIView):
                                 i['api']=data['id']
                                 header_serializer=APIHeadSerializer(data=i)
                                 if header_serializer.is_valid():
-                                    header_serializer.save(api=APIInfo.objects.get(id=data['api']))
+                                    header_serializer.save(api=APIInfo.objects.get(id=data['id']))
                                     header=header|Q(id=header_serializer.data.get('id'))
                 test=APIHead.objects.filter(api=data['id'])
                 APIHead.objects.exclude(header).filter(api=data['id']).delete()
