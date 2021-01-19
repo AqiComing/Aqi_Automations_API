@@ -10,7 +10,8 @@ from requests import ReadTimeout
 from api_test.common.common import record_result, check_json
 from api_test.models import GlobalHost, AutomationCaseApi, AutomationHead, AutomationParameter, AutomationTestResult, \
     AutomationParameterRaw
-from api_test.serializer import AutomationCaseApiSerializer, AutomationParameterRawSerializer
+from api_test.serializer import AutomationCaseApiSerializer, AutomationParameterRawSerializer, \
+    AutomationParameterSerializer, AutomationTestResultSerializer
 
 logger=logging.getLogger(__name__)
 
@@ -39,15 +40,15 @@ def test_api(host_id,case_id,project_id,_id):
     url='http://'+address if http_type=="HTTP" else 'https://'+address
 
     if request_parameter_type=='form-data':
-        parameter_list=json.loads(serializers.serialize('json',AutomationParameter.objects.filter(automation_case_api=_id)))
+        para_list=AutomationParameterSerializer(AutomationParameter.objects.filter(automation_case_api=_id),many=True).data
         parameter={}
 
-        for param in parameter_list:
-            key=param['fields']['name']
-            value=param['fields']['value']
+        for param in para_list:
+            key=param['name']
+            value=param['value']
 
             try:
-                if param['fields']['interrelate']:
+                if param['interrelate']:
                     # 匹配<response>[]中间的数据
                     interrelate_type = re.findall('(?<=<response\[).*?(?=\])', value)
                     if interrelate_type[0] == "JSON":

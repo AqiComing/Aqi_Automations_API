@@ -355,7 +355,7 @@ class AutomationCaseApi(models.Model):
     request_type=models.CharField(max_length=50,verbose_name='请求方式',choices=REQUEST_TYPE_CHOICE)
     api_address=models.CharField(max_length=1024,verbose_name='接口地址')
     request_parameter_type=models.CharField(max_length=50,verbose_name='参数请求格式',choices=REQUEST_PARAMETER_TYPE_CHOICE)
-    format_raw=models.BooleanField(default=False,verbose_name='是否转换位源数据')
+    format_raw=models.BooleanField(default=False,verbose_name='是否转换为源数据')
     examine_type=models.CharField(default='no_check',max_length=50,verbose_name='校验方式',choices=EXAMINE_TYPE_CHOICE)
     http_code=models.CharField(max_length=50,blank=True,null=True,verbose_name='HTTP状态',choices=HTTP_CODE_CHOICE)
     response_data=models.TextField(blank=True,null=True,verbose_name='返回内容')

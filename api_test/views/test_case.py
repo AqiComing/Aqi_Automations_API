@@ -214,7 +214,7 @@ class Test(APIView):
         """
         执行
         :param request:
-        :return:
+        :return:0
         """
         data=JSONParser().parse(request)
         project=get_availability_project(data,request.user)
